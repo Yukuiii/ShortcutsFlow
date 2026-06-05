@@ -13,6 +13,7 @@
     "clean": "rm -rf packages/*/dist examples/dist",
     "example:build": "tsx packages/shortcutsflow/src/cli/main.ts build",
     "example:inspect": "tsx packages/shortcutsflow/src/cli/main.ts inspect examples/dist/basic-shortcut.unsigned.shortcut",
+    "version": "node scripts/sync-workspace-versions.js",
     "shortcut:check": "tsx packages/shortcutsflow/src/cli/main.ts check",
     "test": "npm run build && tsx --test tests/action/*.test.ts tests/*.test.ts",
     "typecheck": "tsc -b tsconfig.build.json --pretty false"
