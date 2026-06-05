@@ -89,7 +89,8 @@ is.workflow.actions.choosefrommenu
 ## 示例
 
 ```ts
-import { defineShortcut, icon } from "@shortcutsflow/actions";
+import { defineShortcut } from "@shortcutsflow/actions";
+import { icon } from "@shortcutsflow/core";
 
 export default defineShortcut({
   name: "Basic Shortcut",
@@ -130,7 +131,8 @@ export default defineShortcut({
 导入 `icon` 辅助对象即可使用内置的 Shortcuts 颜色和图标映射：
 
 ```ts
-import { defineShortcut, icon } from "@shortcutsflow/actions";
+import { defineShortcut } from "@shortcutsflow/actions";
+import { icon } from "@shortcutsflow/core";
 
 defineShortcut({
   name: "Basic Shortcut",
@@ -161,7 +163,8 @@ defineShortcut({
 如果需要精确复刻 plist fixture，可以使用原始值：
 
 ```ts
-import { defineShortcut, icon } from "@shortcutsflow/actions";
+import { defineShortcut } from "@shortcutsflow/actions";
+import { icon } from "@shortcutsflow/core";
 
 defineShortcut({
   name: "Fixture",

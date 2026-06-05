@@ -1,4 +1,4 @@
-import type { ShortcutIcon } from "@shortcutsflow/core";
+import type { ShortcutIcon } from "./types.js";
 import { shortcutIconColorValues, shortcutIconGlyphValues } from "./icon-data.js";
 
 export type ShortcutIconColor = {

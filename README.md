@@ -89,7 +89,8 @@ is.workflow.actions.choosefrommenu
 ## Example
 
 ```ts
-import { defineShortcut, icon } from "@shortcutsflow/actions";
+import { defineShortcut } from "@shortcutsflow/actions";
+import { icon } from "@shortcutsflow/core";
 
 export default defineShortcut({
   name: "Basic Shortcut",
@@ -130,7 +131,8 @@ export default defineShortcut({
 Import the `icon` helper to use the bundled Shortcuts color and glyph maps:
 
 ```ts
-import { defineShortcut, icon } from "@shortcutsflow/actions";
+import { defineShortcut } from "@shortcutsflow/actions";
+import { icon } from "@shortcutsflow/core";
 
 defineShortcut({
   name: "Basic Shortcut",
@@ -161,7 +163,8 @@ defineShortcut({
 If you need to reproduce a plist fixture exactly, use raw values:
 
 ```ts
-import { defineShortcut, icon } from "@shortcutsflow/actions";
+import { defineShortcut } from "@shortcutsflow/actions";
+import { icon } from "@shortcutsflow/core";
 
 defineShortcut({
   name: "Fixture",

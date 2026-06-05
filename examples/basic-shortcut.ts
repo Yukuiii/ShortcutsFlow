@@ -1,4 +1,5 @@
-import { defineShortcut, icon } from "@shortcutsflow/actions";
+import { defineShortcut } from "@shortcutsflow/actions";
+import { icon } from "@shortcutsflow/core";
 
 export default defineShortcut({
   name: "Basic Shortcut",

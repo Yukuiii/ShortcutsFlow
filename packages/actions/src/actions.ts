@@ -3,13 +3,18 @@ import type {
   ShortcutCondition,
   ShortcutDefinition,
   ShortcutDictionary,
+  ShortcutIconInput,
   ShortcutMenuNode,
   ShortcutNode,
   ShortcutRepeatEachNode,
   ShortcutValue,
 } from "@shortcutsflow/core";
-import { equals as createEqualsCondition, exists as createExistsCondition, variable } from "@shortcutsflow/core";
-import { resolveShortcutIcon, type ShortcutIconInput } from "./icon.js";
+import {
+  equals as createEqualsCondition,
+  exists as createExistsCondition,
+  resolveShortcutIcon,
+  variable,
+} from "@shortcutsflow/core";
 
 type ValueInput = string | number | boolean | ShortcutValue;
 
