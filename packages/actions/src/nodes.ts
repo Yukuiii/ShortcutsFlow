@@ -167,14 +167,14 @@ export function notification(title: ValueInput, body?: ValueInput): ShortcutActi
  *
  * @example
  * ```ts
- * import { getValueForKey } from "@shortcutsflow/actions";
+ * import { getDictionaryValue } from "@shortcutsflow/actions";
  * import { variable } from "@shortcutsflow/core";
  *
- * const node = getValueForKey(variable("Config"), "endpoint");
+ * const node = getDictionaryValue(variable("Config"), "endpoint");
  * ```
  */
-export function getValueForKey(input: ValueInput, key: ValueInput): ShortcutActionNode {
-  return action("getValueForKey", {
+export function getDictionaryValue(input: ValueInput, key: ValueInput): ShortcutActionNode {
+  return action("getDictionaryValue", {
     input,
     key,
   });

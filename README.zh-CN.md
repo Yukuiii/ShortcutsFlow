@@ -57,7 +57,7 @@ shortcut.showResult
 shortcut.url
 shortcut.openURL
 shortcut.notification
-shortcut.getValueForKey
+shortcut.getDictionaryValue
 shortcut.getContentsOfURL
 shortcut.base64Encode
 shortcut.base64Decode
@@ -105,7 +105,7 @@ export default defineShortcut({
       encodedConfigUrl: "aHR0cHM6Ly9leGFtcGxlLmNvbS9jb25maWcuanNvbg==",
     });
     const message = shortcut.text("Hello from TypeScript");
-    const encodedConfigUrl = shortcut.getValueForKey(config, "encodedConfigUrl");
+    const encodedConfigUrl = shortcut.getDictionaryValue(config, "encodedConfigUrl");
     const configUrl = shortcut.base64Decode(encodedConfigUrl);
     const remoteConfig = shortcut.getContentsOfURL(configUrl);
 

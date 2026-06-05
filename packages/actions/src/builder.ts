@@ -141,8 +141,8 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     notification(title: ValueInput, body?: ValueInput): void {
       pushAction(actionNodes.notification(title, body));
     },
-    getValueForKey(input: ValueInput, key: ValueInput): ShortcutValue<unknown> {
-      return pushOutputAction("getValueForKey", {
+    getDictionaryValue(input: ValueInput, key: ValueInput): ShortcutValue<unknown> {
+      return pushOutputAction("getDictionaryValue", {
         input,
         key,
       });

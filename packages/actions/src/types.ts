@@ -163,7 +163,7 @@ export type WorkflowBuilder = {
   notification(title: ValueInput, body?: ValueInput): void;
 
   /**
-   * 添加 Get Dictionary Value 动作并返回指定 key 的输出引用，适合从 Dictionary action 中读取配置值。
+   * 添加 Get Dictionary Value 动作并返回指定词典 key 的输出引用，适合从 Dictionary action 中读取配置值。
    *
    * @example
    * ```ts
@@ -171,12 +171,12 @@ export type WorkflowBuilder = {
    *   const config = shortcut.dictionary({
    *     endpoint: "https://example.com/config.json",
    *   });
-   *   const endpoint = shortcut.getValueForKey(config, "endpoint");
+   *   const endpoint = shortcut.getDictionaryValue(config, "endpoint");
    *   shortcut.showResult(endpoint);
    * }
    * ```
    */
-  getValueForKey(input: ValueInput, key: ValueInput): ShortcutValue<unknown>;
+  getDictionaryValue(input: ValueInput, key: ValueInput): ShortcutValue<unknown>;
 
   /**
    * 添加 Get Contents of URL 动作并返回远程响应输出引用，支持配置 HTTP method 和 headers。

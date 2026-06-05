@@ -66,7 +66,7 @@ export const actionSchemas: Record<string, ActionSchema> = {
     identifier: "is.workflow.actions.getitemfromlist",
     outputName: "来自列表的项目",
   },
-  getValueForKey: {
+  getDictionaryValue: {
     identifier: "is.workflow.actions.getvalueforkey",
     outputName: "词典值",
   },

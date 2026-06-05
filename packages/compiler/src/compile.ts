@@ -302,7 +302,7 @@ function compileActionParameters(
     case "getItemFromList":
       return withUuid(uuid, compileGetItemFromListParameters(node, context));
 
-    case "getValueForKey":
+    case "getDictionaryValue":
       return withUuid(uuid, {
         WFInput: compileInput(node.params.input, context),
         WFDictionaryKey: compileTextToken(node.params.key, context),

@@ -9,14 +9,14 @@ import {
   paramsFor,
 } from "./helpers.js";
 
-test("getValueForKey 从字典输出读取字面量 key", () => {
+test("getDictionaryValue 从字典输出读取字面量 key", () => {
   const actions = compileActions(defineShortcut({
-    name: "Get Value For Key Literal",
+    name: "Get Dictionary Value Literal",
     workflow: (shortcut) => {
       const config = shortcut.dictionary({
         endpoint: "https://example.com",
       });
-      shortcut.getValueForKey(config, "endpoint");
+      shortcut.getDictionaryValue(config, "endpoint");
     },
   }));
   const parameters = paramsFor(actions, "is.workflow.actions.getvalueforkey");
@@ -26,15 +26,15 @@ test("getValueForKey 从字典输出读取字面量 key", () => {
   assertUuid(parameters);
 });
 
-test("getValueForKey 支持 key 引用上游 action 输出", () => {
+test("getDictionaryValue 支持 key 引用上游 action 输出", () => {
   const actions = compileActions(defineShortcut({
-    name: "Get Value For Key Output",
+    name: "Get Dictionary Value Output",
     workflow: (shortcut) => {
       const config = shortcut.dictionary({
         endpoint: "https://example.com",
       });
       const key = shortcut.text("endpoint");
-      shortcut.getValueForKey(config, key);
+      shortcut.getDictionaryValue(config, key);
     },
   }));
   const parameters = paramsFor(actions, "is.workflow.actions.getvalueforkey");

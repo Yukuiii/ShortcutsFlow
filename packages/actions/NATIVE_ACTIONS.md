@@ -22,7 +22,7 @@
 | `shortcut.url(value)` | URL | `is.workflow.actions.url` | `WFURLActionURL`, `UUID` | `URL` | 返回值可用 `const url = shortcut.url(...)` 接收。 |
 | `shortcut.openURL(input)` | Open URLs | `is.workflow.actions.openurl` | `WFInput`, `Show-WFInput` | 无 | 当前默认显示输入。 |
 | `shortcut.notification(title, body?)` | Show Notification | `is.workflow.actions.notification` | `WFNotificationActionTitle`, `WFNotificationActionBody` | 无 | 当前只覆盖标题和正文。 |
-| `shortcut.getValueForKey(input, key)` | Get Dictionary Value | `is.workflow.actions.getvalueforkey` | `WFInput`, `WFDictionaryKey`, `UUID` | `词典值` | 后续可扩展 property/aggrandizement 快捷写法。 |
+| `shortcut.getDictionaryValue(input, key)` | Get Dictionary Value | `is.workflow.actions.getvalueforkey` | `WFInput`, `WFDictionaryKey`, `UUID` | `词典值` | 后续可扩展 property/aggrandizement 快捷写法。 |
 | `shortcut.getContentsOfURL(input, options?)` | Get Contents of URL | `is.workflow.actions.downloadurl` | `WFURL`, `WFHTTPMethod`, `WFHTTPHeaders`, `ShowHeaders`, `UUID` | `URL的内容` | 当前支持 method 和 headers。 |
 | `shortcut.base64Encode(input)` | Base64 Encode | `is.workflow.actions.base64encode` | `WFInput`, `WFEncodeMode`, `UUID` | `Base64已编码内容` | `WFEncodeMode = Encode`。 |
 | `shortcut.base64Decode(input)` | Base64 Decode | `is.workflow.actions.base64encode` | `WFInput`, `WFEncodeMode`, `UUID` | `Base64已编码内容` | `WFEncodeMode = Decode`。 |
