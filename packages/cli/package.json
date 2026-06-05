@@ -9,6 +9,7 @@
   "types": "./dist/main.d.ts",
   "dependencies": {
     "@shortcutsflow/compiler": "0.1.0",
-    "@shortcutsflow/core": "0.1.0"
+    "@shortcutsflow/core": "0.1.0",
+    "typescript": "^5.8.0"
   }
 }

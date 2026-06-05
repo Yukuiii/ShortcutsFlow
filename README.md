@@ -67,6 +67,7 @@ Control flow:
 
 ```txt
 shortcut.if
+shortcut.when
 shortcut.repeatEach
 shortcut.chooseFromMenu
 ```
@@ -76,6 +77,15 @@ Conditions:
 ```txt
 shortcut.exists
 shortcut.equals
+value.exists
+value.equals
+value.replace
+value.split
+value.match
+value.get
+value.getItem
+value.base64Encode
+value.base64Decode
 ```
 
 These control-flow nodes are compiled down to native Shortcuts actions:
@@ -105,14 +115,11 @@ export default defineShortcut({
       encodedConfigUrl: "aHR0cHM6Ly9leGFtcGxlLmNvbS9jb25maWcuanNvbg==",
     });
     const message = shortcut.text("Hello from TypeScript");
-    const encodedConfigUrl = shortcut.getDictionaryValue(config, "encodedConfigUrl");
-    const configUrl = shortcut.base64Decode(encodedConfigUrl);
+    const configUrl = config.get("encodedConfigUrl").base64Decode();
     const remoteConfig = shortcut.getContentsOfURL(configUrl);
 
-    shortcut.if(shortcut.exists(message), {
-      then: (shortcut) => {
-        shortcut.notification("Build complete", message);
-      },
+    shortcut.when(message.exists(), (shortcut) => {
+      shortcut.notification("Build complete", message);
     });
 
     shortcut.chooseFromMenu("Choose next action", {

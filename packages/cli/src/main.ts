@@ -5,6 +5,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { assertNoRuntimeSyntaxMisuse } from "./runtime-guard.js";
 
 type BuildOptions = {
   input: string;
@@ -59,6 +60,7 @@ function parseBuildOptions(args: string[]): BuildOptions {
 async function build(options: BuildOptions): Promise<void> {
   const inputPath = resolve(options.input);
   const outDir = resolve(options.outDir);
+  assertNoRuntimeSyntaxMisuse(inputPath);
   const definition = await loadShortcutDefinition(inputPath);
   const result = compileShortcut(definition);
   const fileBase = toKebabCase(result.name);

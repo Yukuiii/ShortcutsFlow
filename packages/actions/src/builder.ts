@@ -20,6 +20,8 @@ import type {
   GetContentsOfURLOptions,
   GetItemFromListOptions,
   OpenAppInput,
+  RuntimeValue,
+  SplitTextSeparator,
   SplitTextOptions,
   ValueInput,
   WorkflowBranch,
@@ -98,10 +100,85 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
   const pushOutputAction = <T>(
     actionName: string,
     params: Record<string, unknown>,
-  ): ShortcutValue<T> => {
+  ): RuntimeValue<T> => {
     const { node, output } = outputAction<T>(actionName, params, state);
     nodes.push(node);
-    return output;
+    return createRuntimeValue(output);
+  };
+  const createRuntimeValue = <T>(value: ShortcutValue<T>): RuntimeValue<T> => {
+    const runtimeValue = value as RuntimeValue<T>;
+
+    if (typeof runtimeValue.exists === "function") {
+      return runtimeValue;
+    }
+
+    Object.defineProperties(runtimeValue, {
+      replace: {
+        value: (find: ValueInput, replace: ValueInput): RuntimeValue<string> =>
+          pushOutputAction("replaceText", {
+            input: runtimeValue,
+            find,
+            replace,
+          }),
+      },
+      split: {
+        value: (separator?: SplitTextSeparator | SplitTextOptions): RuntimeValue<string[]> =>
+          pushOutputAction("splitText", {
+            input: runtimeValue,
+            options: normalizeSplitOptions(separator),
+          }),
+      },
+      match: {
+        value: (pattern: ValueInput): RuntimeValue<string[]> =>
+          pushOutputAction("matchText", {
+            input: runtimeValue,
+            pattern,
+          }),
+      },
+      getDictionaryValue: {
+        value: (key: ValueInput): RuntimeValue<unknown> =>
+          pushOutputAction("getDictionaryValue", {
+            input: runtimeValue,
+            key,
+          }),
+      },
+      get: {
+        value: (key: ValueInput): RuntimeValue<unknown> =>
+          pushOutputAction("getDictionaryValue", {
+            input: runtimeValue,
+            key,
+          }),
+      },
+      getItem: {
+        value: (options: GetItemFromListOptions = {}): RuntimeValue<unknown> =>
+          pushOutputAction("getItemFromList", {
+            input: runtimeValue,
+            options,
+          }),
+      },
+      base64Encode: {
+        value: (): RuntimeValue<string> =>
+          pushOutputAction("base64", {
+            input: runtimeValue,
+            mode: "Encode",
+          }),
+      },
+      base64Decode: {
+        value: (): RuntimeValue<string> =>
+          pushOutputAction("base64", {
+            input: runtimeValue,
+            mode: "Decode",
+          }),
+      },
+      exists: {
+        value: (): ShortcutCondition => createExistsCondition(runtimeValue),
+      },
+      equals: {
+        value: (right: unknown): ShortcutCondition => createEqualsCondition(runtimeValue, right),
+      },
+    });
+
+    return runtimeValue;
   };
   const collectBranch = (branch: WorkflowBranch): ShortcutNode[] => {
     const branchNodes: ShortcutNode[] = [];
@@ -113,7 +190,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     comment(textValue: string): void {
       pushAction(actionNodes.comment(textValue));
     },
-    text(value: ValueInput): ShortcutValue<string> {
+    text(value: ValueInput): RuntimeValue<string> {
       return pushOutputAction("text", {
         value,
       });
@@ -121,16 +198,16 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     showResult(input: ValueInput): void {
       pushAction(actionNodes.showResult(input));
     },
-    setVariable(name: string, input?: ValueInput): ShortcutValue<string> {
+    setVariable(name: string, input?: ValueInput): RuntimeValue<string> {
       pushAction(actionNodes.setVariable(name, input));
-      return variable(name);
+      return createRuntimeValue(variable(name));
     },
-    dictionary(value: ShortcutDictionary): ShortcutValue<ShortcutDictionary> {
+    dictionary(value: ShortcutDictionary): RuntimeValue<ShortcutDictionary> {
       return pushOutputAction("dictionary", {
         value,
       });
     },
-    url(value: ValueInput): ShortcutValue<string> {
+    url(value: ValueInput): RuntimeValue<string> {
       return pushOutputAction("url", {
         value,
       });
@@ -141,7 +218,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     notification(title: ValueInput, body?: ValueInput): void {
       pushAction(actionNodes.notification(title, body));
     },
-    getDictionaryValue(input: ValueInput, key: ValueInput): ShortcutValue<unknown> {
+    getDictionaryValue(input: ValueInput, key: ValueInput): RuntimeValue<unknown> {
       return pushOutputAction("getDictionaryValue", {
         input,
         key,
@@ -150,19 +227,19 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     getContentsOfURL(
       input: ValueInput,
       options: GetContentsOfURLOptions = {},
-    ): ShortcutValue<unknown> {
+    ): RuntimeValue<unknown> {
       return pushOutputAction("getContentsOfURL", {
         input,
         options,
       });
     },
-    base64Encode(input: ValueInput): ShortcutValue<string> {
+    base64Encode(input: ValueInput): RuntimeValue<string> {
       return pushOutputAction("base64", {
         input,
         mode: "Encode",
       });
     },
-    base64Decode(input: ValueInput): ShortcutValue<string> {
+    base64Decode(input: ValueInput): RuntimeValue<string> {
       return pushOutputAction("base64", {
         input,
         mode: "Decode",
@@ -171,7 +248,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     askForInput(
       prompt: ValueInput,
       options: AskForInputOptions = {},
-    ): ShortcutValue<string> {
+    ): RuntimeValue<string> {
       return pushOutputAction("askForInput", {
         prompt,
         options,
@@ -180,24 +257,24 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     chooseFromList(
       input: ValueInput,
       options: ChooseFromListOptions = {},
-    ): ShortcutValue<unknown> {
+    ): RuntimeValue<unknown> {
       return pushOutputAction("chooseFromList", {
         input,
         options,
       });
     },
-    detectDictionary(input: ValueInput): ShortcutValue<ShortcutDictionary> {
+    detectDictionary(input: ValueInput): RuntimeValue<ShortcutDictionary> {
       return pushOutputAction("detectDictionary", {
         input,
       });
     },
-    matchText(input: ValueInput, pattern: ValueInput): ShortcutValue<string[]> {
+    matchText(input: ValueInput, pattern: ValueInput): RuntimeValue<string[]> {
       return pushOutputAction("matchText", {
         input,
         pattern,
       });
     },
-    splitText(input: ValueInput, options: SplitTextOptions = {}): ShortcutValue<string[]> {
+    splitText(input: ValueInput, options: SplitTextOptions = {}): RuntimeValue<string[]> {
       return pushOutputAction("splitText", {
         input,
         options,
@@ -207,7 +284,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
       input: ValueInput,
       find: ValueInput,
       replace: ValueInput,
-    ): ShortcutValue<string> {
+    ): RuntimeValue<string> {
       return pushOutputAction("replaceText", {
         input,
         find,
@@ -217,7 +294,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     getItemFromList(
       input: ValueInput,
       options: GetItemFromListOptions = {},
-    ): ShortcutValue<unknown> {
+    ): RuntimeValue<unknown> {
       return pushOutputAction("getItemFromList", {
         input,
         options,
@@ -229,9 +306,9 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     openApp(app: OpenAppInput): void {
       pushAction(actionNodes.openApp(app));
     },
-    appendVariable(name: string, input: ValueInput): ShortcutValue<unknown> {
+    appendVariable(name: string, input: ValueInput): RuntimeValue<unknown> {
       pushAction(actionNodes.appendVariable(name, input));
-      return variable(name) as ShortcutValue<unknown>;
+      return createRuntimeValue(variable(name) as ShortcutValue<unknown>);
     },
     exists(left: unknown): ShortcutCondition {
       return createExistsCondition(left);
@@ -248,6 +325,13 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
         condition,
         then: collectBranch(branches.then),
         otherwise: branches.otherwise ? collectBranch(branches.otherwise) : undefined,
+      });
+    },
+    when(condition: ShortcutCondition, then: WorkflowBranch): void {
+      nodes.push({
+        kind: "if",
+        condition,
+        then: collectBranch(then),
       });
     },
     repeatEach(input: ValueInput, body: WorkflowBranch): void {
@@ -268,4 +352,15 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
       });
     },
   };
+}
+
+/**
+ * 规范化链式 split 调用的分隔符参数。
+ */
+function normalizeSplitOptions(separator: SplitTextSeparator | SplitTextOptions | undefined): SplitTextOptions {
+  return typeof separator === "string"
+    ? {
+        separator,
+      }
+    : separator ?? {};
 }

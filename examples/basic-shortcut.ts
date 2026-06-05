@@ -15,8 +15,7 @@ export default defineShortcut({
     });
     const message = shortcut.text("Hello from TypeScript");
     const shortcutUrl = shortcut.url("https://www.icloud.com/shortcuts");
-    const encodedConfigUrl = shortcut.getDictionaryValue(config, "encodedConfigUrl");
-    const configUrl = shortcut.base64Decode(encodedConfigUrl);
+    const configUrl = config.get("encodedConfigUrl").base64Decode();
     const remoteConfig = shortcut.getContentsOfURL(configUrl, {
       method: "GET",
       headers: {
@@ -24,13 +23,8 @@ export default defineShortcut({
       },
     });
 
-    shortcut.if(shortcut.exists(message), {
-      then: (shortcut) => {
-        shortcut.notification("Build complete", message);
-      },
-      otherwise: (shortcut) => {
-        shortcut.notification("Missing message");
-      },
+    shortcut.when(message.exists(), (shortcut) => {
+      shortcut.notification("Build complete", message);
     });
 
     shortcut.chooseFromMenu("Choose next action", {
@@ -42,7 +36,7 @@ export default defineShortcut({
       },
     });
 
-    shortcut.if(shortcut.equals(message, "Hello from TypeScript"), {
+    shortcut.if(message.equals("Hello from TypeScript"), {
       then: (shortcut) => {
         shortcut.comment("The generated message matches the expected text.");
       },

@@ -38,6 +38,78 @@ export type GetItemFromListOptions =
       start: ValueInput;
     };
 
+export type RuntimeValue<T = unknown> = ShortcutValue<T> & {
+  /**
+   * 替换文本。
+   *
+   * 添加 Replace Text 动作并返回替换后的运行期文本引用。
+   */
+  replace(find: ValueInput, replace: ValueInput): RuntimeValue<string>;
+
+  /**
+   * 拆分文本。
+   *
+   * 添加 Split Text 动作并返回拆分后的运行期列表引用。
+   */
+  split(separator?: SplitTextSeparator | SplitTextOptions): RuntimeValue<string[]>;
+
+  /**
+   * 匹配文本。
+   *
+   * 添加 Match Text 动作并返回匹配结果的运行期列表引用。
+   */
+  match(pattern: ValueInput): RuntimeValue<string[]>;
+
+  /**
+   * 获取词典值。
+   *
+   * 添加 Get Dictionary Value 动作并返回指定 key 的运行期值引用。
+   */
+  getDictionaryValue(key: ValueInput): RuntimeValue<unknown>;
+
+  /**
+   * 获取词典值。
+   *
+   * 添加 Get Dictionary Value 动作的简写方法，适合链式读取词典字段。
+   */
+  get(key: ValueInput): RuntimeValue<unknown>;
+
+  /**
+   * 从列表中获取项目。
+   *
+   * 添加 Get Item from List 动作并返回列表项目的运行期值引用。
+   */
+  getItem(options?: GetItemFromListOptions): RuntimeValue<unknown>;
+
+  /**
+   * Base64 编码。
+   *
+   * 添加 Base64 Encode 动作并返回编码后的运行期文本引用。
+   */
+  base64Encode(): RuntimeValue<string>;
+
+  /**
+   * Base64 解码。
+   *
+   * 添加 Base64 Decode 动作并返回解码后的运行期文本引用。
+   */
+  base64Decode(): RuntimeValue<string>;
+
+  /**
+   * 如果条件：存在。
+   *
+   * 创建用于 If 控制流的存在性条件对象。
+   */
+  exists(): ShortcutCondition;
+
+  /**
+   * 如果条件：等于。
+   *
+   * 创建用于 If 控制流的相等条件对象。
+   */
+  equals(right: unknown): ShortcutCondition;
+};
+
 export type OpenAppInput = string | {
   bundleIdentifier: string;
   name?: string;
@@ -82,7 +154,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  text(value: ValueInput): ShortcutValue<string>;
+  text(value: ValueInput): RuntimeValue<string>;
 
   /**
    * 显示结果。
@@ -112,7 +184,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  setVariable(name: string, input?: ValueInput): ShortcutValue<string>;
+  setVariable(name: string, input?: ValueInput): RuntimeValue<string>;
 
   /**
    * 词典。
@@ -131,7 +203,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  dictionary(value: ShortcutDictionary): ShortcutValue<ShortcutDictionary>;
+  dictionary(value: ShortcutDictionary): RuntimeValue<ShortcutDictionary>;
 
   /**
    * URL。
@@ -146,7 +218,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  url(value: ValueInput): ShortcutValue<string>;
+  url(value: ValueInput): RuntimeValue<string>;
 
   /**
    * 打开 URL。
@@ -194,7 +266,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  getDictionaryValue(input: ValueInput, key: ValueInput): ShortcutValue<unknown>;
+  getDictionaryValue(input: ValueInput, key: ValueInput): RuntimeValue<unknown>;
 
   /**
    * 获取 URL 内容。
@@ -215,7 +287,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  getContentsOfURL(input: ValueInput, options?: GetContentsOfURLOptions): ShortcutValue<unknown>;
+  getContentsOfURL(input: ValueInput, options?: GetContentsOfURLOptions): RuntimeValue<unknown>;
 
   /**
    * Base64 编码。
@@ -231,7 +303,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  base64Encode(input: ValueInput): ShortcutValue<string>;
+  base64Encode(input: ValueInput): RuntimeValue<string>;
 
   /**
    * Base64 解码。
@@ -247,7 +319,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  base64Decode(input: ValueInput): ShortcutValue<string>;
+  base64Decode(input: ValueInput): RuntimeValue<string>;
 
   /**
    * 询问输入。
@@ -264,7 +336,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  askForInput(prompt: ValueInput, options?: AskForInputOptions): ShortcutValue<string>;
+  askForInput(prompt: ValueInput, options?: AskForInputOptions): RuntimeValue<string>;
 
   /**
    * 从列表中选取。
@@ -281,7 +353,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  chooseFromList(input: ValueInput, options?: ChooseFromListOptions): ShortcutValue<unknown>;
+  chooseFromList(input: ValueInput, options?: ChooseFromListOptions): RuntimeValue<unknown>;
 
   /**
    * 从输入中获取词典。
@@ -297,7 +369,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  detectDictionary(input: ValueInput): ShortcutValue<ShortcutDictionary>;
+  detectDictionary(input: ValueInput): RuntimeValue<ShortcutDictionary>;
 
   /**
    * 匹配文本。
@@ -312,7 +384,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  matchText(input: ValueInput, pattern: ValueInput): ShortcutValue<string[]>;
+  matchText(input: ValueInput, pattern: ValueInput): RuntimeValue<string[]>;
 
   /**
    * 拆分文本。
@@ -329,7 +401,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  splitText(input: ValueInput, options?: SplitTextOptions): ShortcutValue<string[]>;
+  splitText(input: ValueInput, options?: SplitTextOptions): RuntimeValue<string[]>;
 
   /**
    * 替换文本。
@@ -344,7 +416,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  replaceText(input: ValueInput, find: ValueInput, replace: ValueInput): ShortcutValue<string>;
+  replaceText(input: ValueInput, find: ValueInput, replace: ValueInput): RuntimeValue<string>;
 
   /**
    * 从列表中获取项目。
@@ -361,7 +433,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  getItemFromList(input: ValueInput, options?: GetItemFromListOptions): ShortcutValue<unknown>;
+  getItemFromList(input: ValueInput, options?: GetItemFromListOptions): RuntimeValue<unknown>;
 
   /**
    * 等待。
@@ -409,7 +481,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  appendVariable(name: string, input: ValueInput): ShortcutValue<unknown>;
+  appendVariable(name: string, input: ValueInput): RuntimeValue<unknown>;
 
   /**
    * 如果条件：存在。
@@ -473,6 +545,23 @@ export type WorkflowBuilder = {
     then: WorkflowBranch;
     otherwise?: WorkflowBranch;
   }): void;
+
+  /**
+   * 如果。
+   *
+   * 添加只有 then 分支的 If 控制流，是 `shortcut.if(condition, { then })` 的简写。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   shortcut.when(message.exists(), (shortcut) => {
+   *     shortcut.showResult(message);
+   *   });
+   * }
+   * ```
+   */
+  when(condition: ShortcutCondition, then: WorkflowBranch): void;
 
   /**
    * 重复每一项。
