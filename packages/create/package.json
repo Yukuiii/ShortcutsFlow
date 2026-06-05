@@ -6,7 +6,7 @@
     "access": "public"
   },
   "bin": {
-    "create-shortcutsflow": "./dist/main.js"
+    "create-shortcutsflow": "dist/main.js"
   },
   "main": "./dist/main.js",
   "types": "./dist/main.d.ts",
