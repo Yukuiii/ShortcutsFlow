@@ -5,13 +5,13 @@ import type {
   ShortcutDictionary,
   ShortcutNode,
   ShortcutValue,
-} from "@shortcutsflow/core";
+} from "../core/types.js";
 import {
   equals as createEqualsCondition,
   exists as createExistsCondition,
-  resolveShortcutIcon,
   variable,
-} from "@shortcutsflow/core";
+} from "../core/value.js";
+import { resolveShortcutIcon } from "../core/icon.js";
 import * as actionNodes from "./nodes.js";
 import type {
   AskForInputOptions,
@@ -37,8 +37,7 @@ type BuilderState = {
  *
  * @example
  * ```ts
- * import { defineShortcut } from "@shortcutsflow/actions";
- * import { icon } from "@shortcutsflow/core";
+ * import { defineShortcut, icon } from "shortcutsflow";
  *
  * export default defineShortcut({
  *   name: "Basic Shortcut",

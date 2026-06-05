@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut } from "shortcutsflow";
 import { actionsWithIdentifier, compileActions, params } from "./helpers.js";
 
 test("chooseFromMenu 编译菜单开始、菜单项分支和结束控制流", () => {

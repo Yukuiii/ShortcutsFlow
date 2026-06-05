@@ -1,10 +1,10 @@
 import type {
   ShortcutCondition,
   ShortcutDictionary,
-  ShortcutIconInput,
   ShortcutNode,
   ShortcutValue,
-} from "@shortcutsflow/core";
+} from "../core/types.js";
+import type { ShortcutIconInput } from "../core/icon.js";
 
 export type ValueInput = string | number | boolean | ShortcutValue;
 

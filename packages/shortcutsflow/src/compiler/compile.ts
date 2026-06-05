@@ -1,6 +1,4 @@
 import {
-  isShortcutValue,
-  resolveShortcut,
   type ShortcutActionNode,
   type ShortcutCondition,
   type ShortcutDefinition,
@@ -11,8 +9,10 @@ import {
   type ShortcutNode,
   type ShortcutRepeatEachNode,
   type ShortcutValue,
-} from "@shortcutsflow/core";
-import { serializePlist, type PlistValue } from "@shortcutsflow/plist";
+} from "../core/types.js";
+import { resolveShortcut } from "../core/shortcut.js";
+import { isShortcutValue } from "../core/value.js";
+import { serializePlist, type PlistValue } from "../plist/index.js";
 import { randomUUID } from "node:crypto";
 import { actionSchemas, type WorkflowAction, type WorkflowPlist } from "./schema.js";
 import { createWorkflowPlist } from "./workflow.js";

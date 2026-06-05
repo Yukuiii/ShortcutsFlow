@@ -53,7 +53,7 @@ shortcuts sign --mode anyone --input "examples/dist/basic-shortcut.unsigned.shor
 
 ## DSL Capabilities
 
-The native action reference lives in [packages/actions/NATIVE_ACTIONS.md](packages/actions/NATIVE_ACTIONS.md).
+The native action reference lives in [packages/shortcutsflow/NATIVE_ACTIONS.md](packages/shortcutsflow/NATIVE_ACTIONS.md).
 
 Builder actions:
 
@@ -108,8 +108,7 @@ is.workflow.actions.choosefrommenu
 ## Example
 
 ```ts
-import { defineShortcut } from "@shortcutsflow/actions";
-import { icon } from "@shortcutsflow/core";
+import { defineShortcut, icon } from "shortcutsflow";
 
 export default defineShortcut({
   name: "Basic Shortcut",
@@ -147,8 +146,7 @@ export default defineShortcut({
 Import the `icon` helper to use the bundled Shortcuts color and glyph maps:
 
 ```ts
-import { defineShortcut } from "@shortcutsflow/actions";
-import { icon } from "@shortcutsflow/core";
+import { defineShortcut, icon } from "shortcutsflow";
 
 defineShortcut({
   name: "Basic Shortcut",
@@ -179,8 +177,7 @@ defineShortcut({
 If you need to reproduce a plist fixture exactly, use raw values:
 
 ```ts
-import { defineShortcut } from "@shortcutsflow/actions";
-import { icon } from "@shortcutsflow/core";
+import { defineShortcut, icon } from "shortcutsflow";
 
 defineShortcut({
   name: "Fixture",
@@ -195,11 +192,14 @@ defineShortcut({
 
 ```txt
 packages/
-  core/       # Shortcut AST and value model
-  actions/    # Builder DSL used by developers
-  compiler/   # AST -> WFWorkflowActions -> Shortcut plist
-  plist/      # plist XML / binary serialization
-  cli/        # build / inspect / sign commands
+  shortcutsflow/
+    src/
+      actions/
+      cli/
+      compiler/
+      core/
+      plist/
+    NATIVE_ACTIONS.md
   create/     # npm create shortcutsflow scaffolding command
 
 examples/

@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import type { ShortcutDefinition } from "@shortcutsflow/core";
+import type { ShortcutDefinition } from "../core/types.js";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
@@ -69,7 +69,7 @@ function parseBuildOptions(args: string[]): BuildOptions {
  */
 async function build(options: BuildOptions): Promise<void> {
   const targets = await resolveBuildTargets(options);
-  const { compileShortcut } = await import("@shortcutsflow/compiler");
+  const { compileShortcut } = await import("../compiler/index.js");
 
   for (const target of targets) {
     const inputPath = resolve(target.input);

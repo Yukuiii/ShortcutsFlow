@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut } from "shortcutsflow";
 import { assertTextTokenActionOutput, assertUuid, compileActions, paramsFor } from "./helpers.js";
 
 test("text 编译为 Shortcuts Text action 并产生可引用输出", () => {

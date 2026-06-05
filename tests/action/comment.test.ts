@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut } from "shortcutsflow";
 import { compileActions, paramsFor } from "./helpers.js";
 
 test("comment 编译为 Shortcuts Comment action", () => {

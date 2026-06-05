@@ -149,8 +149,8 @@ is.workflow.actions.urlencode
 1. 在 Shortcuts App 中手动创建最小快捷指令并导出未签名 `.shortcut`。
 2. 用 `plutil -convert json` 转成 JSON。
 3. 记录 `WFWorkflowActionIdentifier` 和最小参数 key。
-4. 在 `packages/actions/src/actions.ts` 加 DSL。
-5. 在 `packages/compiler/src/schema.ts` 加 identifier 和默认输出名。
-6. 在 `packages/compiler/src/compile.ts` 加参数编译分支。
+4. 在 `packages/shortcutsflow/src/actions/actions.ts` 加 DSL。
+5. 在 `packages/shortcutsflow/src/compiler/schema.ts` 加 identifier 和默认输出名。
+6. 在 `packages/shortcutsflow/src/compiler/compile.ts` 加参数编译分支。
 7. 在 `examples/basic-shortcut.ts` 或 fixture 中覆盖该 action。
 8. 跑 `npm run typecheck && npm run example:build && plutil -lint ...`。

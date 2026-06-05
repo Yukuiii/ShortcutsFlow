@@ -1,7 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
-import { compileShortcut } from "@shortcutsflow/compiler";
+import { defineShortcut, compileShortcut } from "shortcutsflow";
 import { compileActions, paramsFor } from "./helpers.js";
 
 test("openApp 支持 bundle identifier 字符串", () => {
