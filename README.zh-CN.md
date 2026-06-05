@@ -89,14 +89,11 @@ is.workflow.actions.choosefrommenu
 ## 示例
 
 ```ts
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut, icon } from "@shortcutsflow/actions";
 
 export default defineShortcut({
   name: "Basic Shortcut",
-  icon: {
-    color: "blue",
-    glyph: "shortcut",
-  },
+  icon: icon.create(icon.color.blue, icon.glyph.shortcuts),
   workflow: (shortcut) => {
     shortcut.comment("Generated from TypeScript.");
 
@@ -130,34 +127,45 @@ export default defineShortcut({
 
 ## 快捷指令图标
 
-快捷指令图标优先使用语义化名称：
+导入 `icon` 辅助对象即可使用内置的 Shortcuts 颜色和图标映射：
 
 ```ts
+import { defineShortcut, icon } from "@shortcutsflow/actions";
+
 defineShortcut({
   name: "Basic Shortcut",
-  icon: {
-    color: "blue",
-    glyph: "shortcut",
-  },
+  icon: icon.create(icon.color.blue, icon.glyph.shortcuts),
   workflow: (shortcut) => {
     shortcut.showResult("Hello");
   },
 });
 ```
 
-`color` 支持 `shortcutIconColors` 导出的内置颜色名称，也支持 `"#1b9af7"` 这类十六进制颜色。`glyph` 支持 `shortcutIconGlyphs` 导出的内置图标名称。
+也可以直接传入 map 里的值：
+
+```ts
+defineShortcut({
+  name: "Flight",
+  icon: {
+    color: icon.color.blue,
+    glyph: icon.glyph.airplane,
+  },
+  workflow: (shortcut) => {
+    shortcut.showResult("Ready");
+  },
+});
+```
+
+`icon.color` 来自 `colors.json` 的 Shortcuts 颜色映射；`icon.glyph` 来自 `glyphs.json` 的图标映射。
 
 如果需要精确复刻 plist fixture，可以使用原始值：
 
 ```ts
-import { defineShortcut, rawIconColor, rawIconGlyph } from "@shortcutsflow/actions";
+import { defineShortcut, icon } from "@shortcutsflow/actions";
 
 defineShortcut({
   name: "Fixture",
-  icon: {
-    color: rawIconColor(463140863),
-    glyph: rawIconGlyph(59684),
-  },
+  icon: icon.create(icon.rawColor(463140863), icon.rawGlyph(59684)),
   workflow: (shortcut) => {
     shortcut.showResult("Hello");
   },

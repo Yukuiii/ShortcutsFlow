@@ -89,14 +89,11 @@ is.workflow.actions.choosefrommenu
 ## Example
 
 ```ts
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut, icon } from "@shortcutsflow/actions";
 
 export default defineShortcut({
   name: "Basic Shortcut",
-  icon: {
-    color: "blue",
-    glyph: "shortcut",
-  },
+  icon: icon.create(icon.color.blue, icon.glyph.shortcuts),
   workflow: (shortcut) => {
     shortcut.comment("Generated from TypeScript.");
 
@@ -130,34 +127,45 @@ export default defineShortcut({
 
 ## Shortcut Icon
 
-Use semantic names for shortcut icons:
+Import the `icon` helper to use the bundled Shortcuts color and glyph maps:
 
 ```ts
+import { defineShortcut, icon } from "@shortcutsflow/actions";
+
 defineShortcut({
   name: "Basic Shortcut",
-  icon: {
-    color: "blue",
-    glyph: "shortcut",
-  },
+  icon: icon.create(icon.color.blue, icon.glyph.shortcuts),
   workflow: (shortcut) => {
     shortcut.showResult("Hello");
   },
 });
 ```
 
-`color` accepts the built-in color names exported by `shortcutIconColors`, or a hex color such as `"#1b9af7"`. `glyph` accepts the built-in glyph names exported by `shortcutIconGlyphs`.
+You can also pass the map values directly:
+
+```ts
+defineShortcut({
+  name: "Flight",
+  icon: {
+    color: icon.color.blue,
+    glyph: icon.glyph.airplane,
+  },
+  workflow: (shortcut) => {
+    shortcut.showResult("Ready");
+  },
+});
+```
+
+`icon.color` contains the Shortcuts colors from `colors.json`; `icon.glyph` contains the glyphs from `glyphs.json`.
 
 If you need to reproduce a plist fixture exactly, use raw values:
 
 ```ts
-import { defineShortcut, rawIconColor, rawIconGlyph } from "@shortcutsflow/actions";
+import { defineShortcut, icon } from "@shortcutsflow/actions";
 
 defineShortcut({
   name: "Fixture",
-  icon: {
-    color: rawIconColor(463140863),
-    glyph: rawIconGlyph(59684),
-  },
+  icon: icon.create(icon.rawColor(463140863), icon.rawGlyph(59684)),
   workflow: (shortcut) => {
     shortcut.showResult("Hello");
   },

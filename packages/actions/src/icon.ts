@@ -1,51 +1,68 @@
 import type { ShortcutIcon } from "@shortcutsflow/core";
+import { shortcutIconColorValues, shortcutIconGlyphValues } from "./icon-data.js";
 
-export const shortcutIconColors = {
-  red: "#ff3b30",
-  orange: "#ff9500",
-  yellow: "#ffcc00",
-  green: "#34c759",
-  mint: "#00c7be",
-  teal: "#30b0c7",
-  cyan: "#32ade6",
-  blue: "#1b9af7",
-  indigo: "#5856d6",
-  purple: "#af52de",
-  pink: "#ff2d55",
-  gray: "#8e8e93",
-} as const;
-
-export const shortcutIconGlyphs = {
-  shortcut: 59684,
-} as const;
-
-type RawIconColor = {
+export type ShortcutIconColor = {
   kind: "color";
   raw: number;
+  name?: string;
 };
 
-type RawIconGlyph = {
+export type ShortcutIconGlyph = {
   kind: "glyph";
   raw: number;
+  name?: string;
 };
 
-export type ShortcutIconColorName = keyof typeof shortcutIconColors;
+export type ShortcutIconColorName = keyof typeof shortcutIconColorValues;
 
-export type ShortcutIconColorInput = ShortcutIconColorName | `#${string}` | RawIconColor;
+export type ShortcutIconColorInput = ShortcutIconColorName | `#${string}` | ShortcutIconColor;
 
-export type ShortcutIconGlyphName = keyof typeof shortcutIconGlyphs;
+export type ShortcutIconGlyphName = keyof typeof shortcutIconGlyphValues;
 
-export type ShortcutIconGlyphInput = ShortcutIconGlyphName | RawIconGlyph;
+export type ShortcutIconGlyphInput = ShortcutIconGlyphName | ShortcutIconGlyph;
 
 export type ShortcutIconInput = {
   color?: ShortcutIconColorInput;
   glyph?: ShortcutIconGlyphInput;
 };
 
+type ShortcutIconColorMap = {
+  readonly [Name in ShortcutIconColorName]: ShortcutIconColor;
+};
+
+type ShortcutIconGlyphMap = {
+  readonly [Name in ShortcutIconGlyphName]: ShortcutIconGlyph;
+};
+
+export const shortcutIconColors = createIconColorMap();
+
+export const shortcutIconGlyphs = createIconGlyphMap();
+
+export const icon = {
+  color: shortcutIconColors,
+  glyph: shortcutIconGlyphs,
+  create,
+  rawColor: rawIconColor,
+  rawGlyph: rawIconGlyph,
+} as const;
+
+/**
+ * 创建一个开发者可直接传入 defineShortcut 的快捷指令图标配置。
+ */
+export function create(
+  color: ShortcutIconColorInput = shortcutIconColors.blue,
+  glyph: ShortcutIconGlyphInput = shortcutIconGlyphs.shortcuts,
+): ShortcutIconInput {
+  return {
+    color,
+    glyph,
+  };
+}
+
 /**
  * 创建一个显式的 Shortcuts 图标颜色原始值。
  */
-export function rawIconColor(value: number): RawIconColor {
+export function rawIconColor(value: number): ShortcutIconColor {
   assertUnsignedInteger("Icon color", value);
   return {
     kind: "color",
@@ -56,7 +73,7 @@ export function rawIconColor(value: number): RawIconColor {
 /**
  * 创建一个显式的 Shortcuts 图标字形原始值。
  */
-export function rawIconGlyph(value: number): RawIconGlyph {
+export function rawIconGlyph(value: number): ShortcutIconGlyph {
   assertPositiveInteger("Icon glyph", value);
   return {
     kind: "glyph",
@@ -74,8 +91,40 @@ export function resolveShortcutIcon(icon: ShortcutIconInput | undefined): Shortc
 
   return {
     color: resolveIconColor(icon.color ?? "blue"),
-    glyph: resolveIconGlyph(icon.glyph ?? "shortcut"),
+    glyph: resolveIconGlyph(icon.glyph ?? "shortcuts"),
   };
+}
+
+/**
+ * 创建带类型标记的颜色映射。
+ */
+function createIconColorMap(): ShortcutIconColorMap {
+  return Object.fromEntries(
+    Object.entries(shortcutIconColorValues).map(([name, raw]) => [
+      name,
+      {
+        kind: "color",
+        name,
+        raw,
+      },
+    ]),
+  ) as ShortcutIconColorMap;
+}
+
+/**
+ * 创建带类型标记的字形映射。
+ */
+function createIconGlyphMap(): ShortcutIconGlyphMap {
+  return Object.fromEntries(
+    Object.entries(shortcutIconGlyphValues).map(([name, raw]) => [
+      name,
+      {
+        kind: "glyph",
+        name,
+        raw,
+      },
+    ]),
+  ) as ShortcutIconGlyphMap;
 }
 
 /**
@@ -90,9 +139,17 @@ function resolveIconColor(color: ShortcutIconColorInput): number {
     return color.raw;
   }
 
-  const colorValue = shortcutIconColors[color as ShortcutIconColorName] ?? color;
+  if (color.startsWith("#")) {
+    return parseHexColor(color);
+  }
 
-  return parseHexColor(colorValue);
+  const colorValue = shortcutIconColorValues[color as ShortcutIconColorName];
+
+  if (colorValue === undefined) {
+    throw new Error(`Invalid icon color: ${color}`);
+  }
+
+  return colorValue;
 }
 
 /**
@@ -107,7 +164,7 @@ function resolveIconGlyph(glyph: ShortcutIconGlyphInput): number {
     return glyph.raw;
   }
 
-  const glyphValue = shortcutIconGlyphs[glyph as ShortcutIconGlyphName];
+  const glyphValue = shortcutIconGlyphValues[glyph as ShortcutIconGlyphName];
 
   if (glyphValue === undefined) {
     throw new Error(`Invalid icon glyph: ${glyph}`);
