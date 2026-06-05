@@ -1,8 +1,10 @@
 #!/usr/bin/env node
-import { existsSync, mkdirSync, readdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { basename, dirname, join, resolve } from "node:path";
 
-const packageVersion = "0.1.0";
+const packageVersion = readPackageVersion();
+const shortcutSourcePath = "src/shortcut.ts";
+const shortcutOutputBase = basename(shortcutSourcePath, ".ts");
 
 type ProjectFile = {
   path: string;
@@ -94,7 +96,7 @@ function createProjectFiles(projectName: string): ProjectFile[] {
 `,
     },
     {
-      path: "src/shortcut.ts",
+      path: shortcutSourcePath,
       contents: `import { defineShortcut, icon } from "shortcutsflow";
 
 export default defineShortcut({
@@ -165,8 +167,8 @@ function createPackageJson(projectName: string): Record<string, unknown> {
     scripts: {
       build: "shortcutsflow build",
       check: "shortcutsflow check",
-      inspect: "shortcutsflow inspect dist/basic-shortcut.unsigned.shortcut",
-      sign: "shortcutsflow sign dist/basic-shortcut.unsigned.shortcut dist/basic-shortcut.shortcut",
+      inspect: `shortcutsflow inspect dist/${shortcutOutputBase}.unsigned.shortcut`,
+      sign: `shortcutsflow sign dist/${shortcutOutputBase}.unsigned.shortcut dist/${shortcutOutputBase}.shortcut`,
     },
     dependencies: {
       shortcutsflow: `^${packageVersion}`,
@@ -175,6 +177,23 @@ function createPackageJson(projectName: string): Record<string, unknown> {
       typescript: "^5.8.0",
     },
   };
+}
+
+/**
+ * 读取 create-shortcutsflow 自身的发布版本。
+ */
+function readPackageVersion(): string {
+  const packageJson = JSON.parse(
+    readFileSync(new URL("../package.json", import.meta.url), "utf8"),
+  ) as {
+    version?: string;
+  };
+
+  if (!packageJson.version) {
+    throw new Error("Missing package version.");
+  }
+
+  return packageJson.version;
 }
 
 /**

@@ -2,7 +2,7 @@
 import type { ShortcutDefinition } from "../core/types.js";
 import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { basename, join, resolve } from "node:path";
+import { basename, join, parse, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { tsImport } from "tsx/esm/api";
 import { assertNoRuntimeSyntaxMisuse } from "./runtime-guard.js";
@@ -77,7 +77,7 @@ async function build(options: BuildOptions): Promise<void> {
     assertNoRuntimeSyntaxMisuse(inputPath);
     const definition = await loadShortcutDefinition(inputPath);
     const result = compileShortcut(definition);
-    const fileBase = toKebabCase(result.name);
+    const fileBase = toKebabCase(parse(inputPath).name);
     const xmlPath = join(outDir, `${fileBase}.unsigned.plist`);
     const jsonPath = join(outDir, `${fileBase}.unsigned.json`);
     const shortcutPath = join(outDir, `${fileBase}.unsigned.shortcut`);

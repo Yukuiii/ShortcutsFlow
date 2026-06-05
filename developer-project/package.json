@@ -6,8 +6,8 @@
   "scripts": {
     "build": "shortcutsflow build",
     "check": "shortcutsflow check",
-    "inspect": "shortcutsflow inspect dist/basic-shortcut.unsigned.shortcut",
-    "sign": "shortcutsflow sign dist/basic-shortcut.unsigned.shortcut dist/basic-shortcut.shortcut"
+    "inspect": "shortcutsflow inspect dist/shortcut.unsigned.shortcut",
+    "sign": "shortcutsflow sign dist/shortcut.unsigned.shortcut dist/shortcut.shortcut"
   },
   "dependencies": {
     "shortcutsflow": "^0.1.0"
