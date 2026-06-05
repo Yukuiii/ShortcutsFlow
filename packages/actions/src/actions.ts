@@ -3,13 +3,13 @@ import type {
   ShortcutCondition,
   ShortcutDefinition,
   ShortcutDictionary,
-  ShortcutIcon,
   ShortcutMenuNode,
   ShortcutNode,
   ShortcutRepeatEachNode,
   ShortcutValue,
 } from "@shortcutsflow/core";
 import { equals as createEqualsCondition, exists as createExistsCondition, variable } from "@shortcutsflow/core";
+import { resolveShortcutIcon, type ShortcutIconInput } from "./icon.js";
 
 type ValueInput = string | number | boolean | ShortcutValue;
 
@@ -26,7 +26,7 @@ export type WorkflowBranch = (shortcut: WorkflowBuilder) => void;
 
 export type BuilderShortcutDefinition = {
   name: string;
-  icon?: ShortcutIcon;
+  icon?: ShortcutIconInput;
   workflow: WorkflowBranch;
 };
 
@@ -138,7 +138,7 @@ export function defineShortcut(definition: BuilderShortcutDefinition): ShortcutD
 
   return {
     name: definition.name,
-    icon: definition.icon,
+    icon: resolveShortcutIcon(definition.icon),
     workflow: () => nodes,
   };
 }

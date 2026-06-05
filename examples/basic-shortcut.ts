@@ -3,8 +3,8 @@ import { defineShortcut } from "@shortcutsflow/actions";
 export default defineShortcut({
   name: "Basic Shortcut",
   icon: {
-    color: 463140863,
-    glyph: 59684,
+    color: "blue",
+    glyph: "shortcut",
   },
   workflow: (shortcut) => {
     shortcut.comment("Generated from TypeScript.");

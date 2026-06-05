@@ -94,8 +94,8 @@ import { defineShortcut } from "@shortcutsflow/actions";
 export default defineShortcut({
   name: "Basic Shortcut",
   icon: {
-    color: 463140863,
-    glyph: 59684,
+    color: "blue",
+    glyph: "shortcut",
   },
   workflow: (shortcut) => {
     shortcut.comment("Generated from TypeScript.");
@@ -124,6 +124,42 @@ export default defineShortcut({
     });
 
     shortcut.showResult(remoteConfig);
+  },
+});
+```
+
+## Shortcut Icon
+
+Use semantic names for shortcut icons:
+
+```ts
+defineShortcut({
+  name: "Basic Shortcut",
+  icon: {
+    color: "blue",
+    glyph: "shortcut",
+  },
+  workflow: (shortcut) => {
+    shortcut.showResult("Hello");
+  },
+});
+```
+
+`color` accepts the built-in color names exported by `shortcutIconColors`, or a hex color such as `"#1b9af7"`. `glyph` accepts the built-in glyph names exported by `shortcutIconGlyphs`.
+
+If you need to reproduce a plist fixture exactly, use raw values:
+
+```ts
+import { defineShortcut, rawIconColor, rawIconGlyph } from "@shortcutsflow/actions";
+
+defineShortcut({
+  name: "Fixture",
+  icon: {
+    color: rawIconColor(463140863),
+    glyph: rawIconGlyph(59684),
+  },
+  workflow: (shortcut) => {
+    shortcut.showResult("Hello");
   },
 });
 ```
