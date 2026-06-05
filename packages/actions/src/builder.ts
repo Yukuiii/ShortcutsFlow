@@ -14,8 +14,13 @@ import {
 } from "@shortcutsflow/core";
 import * as actionNodes from "./nodes.js";
 import type {
+  AskForInputOptions,
   BuilderShortcutDefinition,
+  ChooseFromListOptions,
   GetContentsOfURLOptions,
+  GetItemFromListOptions,
+  OpenAppInput,
+  SplitTextOptions,
   ValueInput,
   WorkflowBranch,
   WorkflowBuilder,
@@ -162,6 +167,71 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
         input,
         mode: "Decode",
       });
+    },
+    askForInput(
+      prompt: ValueInput,
+      options: AskForInputOptions = {},
+    ): ShortcutValue<string> {
+      return pushOutputAction("askForInput", {
+        prompt,
+        options,
+      });
+    },
+    chooseFromList(
+      input: ValueInput,
+      options: ChooseFromListOptions = {},
+    ): ShortcutValue<unknown> {
+      return pushOutputAction("chooseFromList", {
+        input,
+        options,
+      });
+    },
+    detectDictionary(input: ValueInput): ShortcutValue<ShortcutDictionary> {
+      return pushOutputAction("detectDictionary", {
+        input,
+      });
+    },
+    matchText(input: ValueInput, pattern: ValueInput): ShortcutValue<string[]> {
+      return pushOutputAction("matchText", {
+        input,
+        pattern,
+      });
+    },
+    splitText(input: ValueInput, options: SplitTextOptions = {}): ShortcutValue<string[]> {
+      return pushOutputAction("splitText", {
+        input,
+        options,
+      });
+    },
+    replaceText(
+      input: ValueInput,
+      find: ValueInput,
+      replace: ValueInput,
+    ): ShortcutValue<string> {
+      return pushOutputAction("replaceText", {
+        input,
+        find,
+        replace,
+      });
+    },
+    getItemFromList(
+      input: ValueInput,
+      options: GetItemFromListOptions = {},
+    ): ShortcutValue<unknown> {
+      return pushOutputAction("getItemFromList", {
+        input,
+        options,
+      });
+    },
+    delay(seconds: ValueInput): void {
+      pushAction(actionNodes.delay(seconds));
+    },
+    openApp(app: OpenAppInput): void {
+      pushAction(actionNodes.openApp(app));
+    },
+    appendVariable(name: string, input: ValueInput): ShortcutValue<unknown> {
+      pushAction(actionNodes.appendVariable(name, input));
+      return variable(name) as ShortcutValue<unknown>;
     },
     exists(left: unknown): ShortcutCondition {
       return createExistsCondition(left);

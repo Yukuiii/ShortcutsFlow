@@ -6,7 +6,16 @@ import type {
   ShortcutNode,
   ShortcutRepeatEachNode,
 } from "@shortcutsflow/core";
-import type { GetContentsOfURLOptions, MenuItems, ValueInput } from "./types.js";
+import type {
+  AskForInputOptions,
+  ChooseFromListOptions,
+  GetContentsOfURLOptions,
+  GetItemFromListOptions,
+  MenuItems,
+  OpenAppInput,
+  SplitTextOptions,
+  ValueInput,
+} from "./types.js";
 
 /**
  * 创建底层 action 节点。
@@ -227,6 +236,204 @@ export function base64Decode(input: ValueInput): ShortcutActionNode {
   return action("base64", {
     input,
     mode: "Decode",
+  });
+}
+
+/**
+ * 创建 Shortcuts Ask for Input 动作节点，适合直接构造 AST 时请求用户输入文本。
+ *
+ * @example
+ * ```ts
+ * import { askForInput } from "@shortcutsflow/actions";
+ *
+ * const node = askForInput("输入 cookie", {
+ *   defaultAnswer: "",
+ * });
+ * ```
+ */
+export function askForInput(
+  prompt: ValueInput,
+  options: AskForInputOptions = {},
+): ShortcutActionNode {
+  return action("askForInput", {
+    prompt,
+    options,
+  });
+}
+
+/**
+ * 创建 Shortcuts Choose from List 动作节点，适合直接构造 AST 时让用户从输入列表中选择一项。
+ *
+ * @example
+ * ```ts
+ * import { chooseFromList } from "@shortcutsflow/actions";
+ * import { variable } from "@shortcutsflow/core";
+ *
+ * const node = chooseFromList(variable("Items"), {
+ *   prompt: "选择环境",
+ * });
+ * ```
+ */
+export function chooseFromList(
+  input: ValueInput,
+  options: ChooseFromListOptions = {},
+): ShortcutActionNode {
+  return action("chooseFromList", {
+    input,
+    options,
+  });
+}
+
+/**
+ * 创建 Shortcuts Detect Dictionary 动作节点，适合直接构造 AST 时把 JSON 或字典内容识别成词典。
+ *
+ * @example
+ * ```ts
+ * import { detectDictionary } from "@shortcutsflow/actions";
+ * import { variable } from "@shortcutsflow/core";
+ *
+ * const node = detectDictionary(variable("Response"));
+ * ```
+ */
+export function detectDictionary(input: ValueInput): ShortcutActionNode {
+  return action("detectDictionary", {
+    input,
+  });
+}
+
+/**
+ * 创建 Shortcuts Match Text 动作节点，适合直接构造 AST 时用正则表达式提取匹配结果。
+ *
+ * @example
+ * ```ts
+ * import { matchText } from "@shortcutsflow/actions";
+ *
+ * const node = matchText("Cookie: abc", "Cookie: (.+)");
+ * ```
+ */
+export function matchText(input: ValueInput, pattern: ValueInput): ShortcutActionNode {
+  return action("matchText", {
+    input,
+    pattern,
+  });
+}
+
+/**
+ * 创建 Shortcuts Split Text 动作节点，适合直接构造 AST 时把文本拆成列表。
+ *
+ * @example
+ * ```ts
+ * import { splitText } from "@shortcutsflow/actions";
+ *
+ * const node = splitText("hello world", {
+ *   separator: "Spaces",
+ * });
+ * ```
+ */
+export function splitText(
+  input: ValueInput,
+  options: SplitTextOptions = {},
+): ShortcutActionNode {
+  return action("splitText", {
+    input,
+    options,
+  });
+}
+
+/**
+ * 创建 Shortcuts Replace Text 动作节点，适合直接构造 AST 时替换文本内容。
+ *
+ * @example
+ * ```ts
+ * import { replaceText } from "@shortcutsflow/actions";
+ *
+ * const node = replaceText("hello world", "world", "ShortcutsFlow");
+ * ```
+ */
+export function replaceText(
+  input: ValueInput,
+  find: ValueInput,
+  replace: ValueInput,
+): ShortcutActionNode {
+  return action("replaceText", {
+    input,
+    find,
+    replace,
+  });
+}
+
+/**
+ * 创建 Shortcuts Get Item from List 动作节点，适合直接构造 AST 时从列表中取指定项目。
+ *
+ * @example
+ * ```ts
+ * import { getItemFromList } from "@shortcutsflow/actions";
+ * import { variable } from "@shortcutsflow/core";
+ *
+ * const node = getItemFromList(variable("Items"), {
+ *   mode: "random",
+ * });
+ * ```
+ */
+export function getItemFromList(
+  input: ValueInput,
+  options: GetItemFromListOptions = {},
+): ShortcutActionNode {
+  return action("getItemFromList", {
+    input,
+    options,
+  });
+}
+
+/**
+ * 创建 Shortcuts Delay 动作节点，适合直接构造 AST 时暂停指定秒数。
+ *
+ * @example
+ * ```ts
+ * import { delay } from "@shortcutsflow/actions";
+ *
+ * const node = delay(3);
+ * ```
+ */
+export function delay(seconds: ValueInput): ShortcutActionNode {
+  return action("delay", {
+    seconds,
+  });
+}
+
+/**
+ * 创建 Shortcuts Open App 动作节点，适合直接构造 AST 时打开指定 App。
+ *
+ * @example
+ * ```ts
+ * import { openApp } from "@shortcutsflow/actions";
+ *
+ * const node = openApp({
+ *   bundleIdentifier: "com.apple.shortcuts",
+ *   name: "快捷指令",
+ * });
+ * ```
+ */
+export function openApp(app: OpenAppInput): ShortcutActionNode {
+  return action("openApp", {
+    app,
+  });
+}
+
+/**
+ * 创建 Shortcuts Add to Variable 动作节点，适合直接构造 AST 时把输入追加到运行期命名变量。
+ *
+ * @example
+ * ```ts
+ * import { appendVariable } from "@shortcutsflow/actions";
+ *
+ * const node = appendVariable("Tasks", "Task");
+ * ```
+ */
+export function appendVariable(name: string, input: ValueInput): ShortcutActionNode {
+  return action("appendVariable", {
+    name,
+    input,
   });
 }
 

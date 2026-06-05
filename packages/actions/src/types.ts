@@ -15,6 +15,35 @@ export type GetContentsOfURLOptions = {
   headers?: ShortcutDictionary;
 };
 
+export type AskForInputOptions = {
+  defaultAnswer?: ValueInput;
+};
+
+export type ChooseFromListOptions = {
+  prompt?: ValueInput;
+};
+
+export type SplitTextSeparator = "New Lines" | "Spaces" | "Commas";
+
+export type SplitTextOptions = {
+  separator?: SplitTextSeparator;
+};
+
+export type GetItemFromListOptions =
+  | {
+      mode?: "first" | "last" | "random";
+    }
+  | {
+      mode: "range";
+      start: ValueInput;
+    };
+
+export type OpenAppInput = string | {
+  bundleIdentifier: string;
+  name?: string;
+  teamIdentifier?: string;
+};
+
 export type MenuItems = Record<string, ShortcutNode[]>;
 
 export type WorkflowBranch = (shortcut: WorkflowBuilder) => void;
@@ -195,6 +224,148 @@ export type WorkflowBuilder = {
    * ```
    */
   base64Decode(input: ValueInput): ShortcutValue<string>;
+
+  /**
+   * 添加 Ask for Input 动作并返回用户输入内容。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const cookie = shortcut.askForInput("输入 cookie", {
+   *     defaultAnswer: "",
+   *   });
+   *   shortcut.showResult(cookie);
+   * }
+   * ```
+   */
+  askForInput(prompt: ValueInput, options?: AskForInputOptions): ShortcutValue<string>;
+
+  /**
+   * 添加 Choose from List 动作并返回用户选中的项目。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const selected = shortcut.chooseFromList("dev,prod", {
+   *     prompt: "选择环境",
+   *   });
+   *   shortcut.showResult(selected);
+   * }
+   * ```
+   */
+  chooseFromList(input: ValueInput, options?: ChooseFromListOptions): ShortcutValue<unknown>;
+
+  /**
+   * 添加 Detect Dictionary 动作并返回从输入中识别出的词典。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const response = shortcut.getContentsOfURL("https://example.com/config.json");
+   *   const config = shortcut.detectDictionary(response);
+   *   shortcut.showResult(config);
+   * }
+   * ```
+   */
+  detectDictionary(input: ValueInput): ShortcutValue<ShortcutDictionary>;
+
+  /**
+   * 添加 Match Text 动作并返回正则匹配结果。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const matches = shortcut.matchText("Cookie: abc", "Cookie: (.+)");
+   *   shortcut.showResult(matches);
+   * }
+   * ```
+   */
+  matchText(input: ValueInput, pattern: ValueInput): ShortcutValue<string[]>;
+
+  /**
+   * 添加 Split Text 动作并返回拆分后的文本列表。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const words = shortcut.splitText("hello world", {
+   *     separator: "Spaces",
+   *   });
+   *   shortcut.showResult(words);
+   * }
+   * ```
+   */
+  splitText(input: ValueInput, options?: SplitTextOptions): ShortcutValue<string[]>;
+
+  /**
+   * 添加 Replace Text 动作并返回替换后的文本。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const updated = shortcut.replaceText("hello world", "world", "ShortcutsFlow");
+   *   shortcut.showResult(updated);
+   * }
+   * ```
+   */
+  replaceText(input: ValueInput, find: ValueInput, replace: ValueInput): ShortcutValue<string>;
+
+  /**
+   * 添加 Get Item from List 动作并返回列表中的项目。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const item = shortcut.getItemFromList("dev,prod", {
+   *     mode: "random",
+   *   });
+   *   shortcut.showResult(item);
+   * }
+   * ```
+   */
+  getItemFromList(input: ValueInput, options?: GetItemFromListOptions): ShortcutValue<unknown>;
+
+  /**
+   * 添加 Delay 动作并暂停指定秒数。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   shortcut.delay(3);
+   *   shortcut.showResult("Done");
+   * }
+   * ```
+   */
+  delay(seconds: ValueInput): void;
+
+  /**
+   * 添加 Open App 动作并打开指定 bundle identifier 的 App。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   shortcut.openApp({
+   *     bundleIdentifier: "com.apple.shortcuts",
+   *     name: "快捷指令",
+   *   });
+   * }
+   * ```
+   */
+  openApp(app: OpenAppInput): void;
+
+  /**
+   * 添加 Append to Variable 动作并把输入追加到运行期命名变量。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const item = shortcut.text("Task");
+   *   const tasks = shortcut.appendVariable("Tasks", item);
+   *   shortcut.showResult(tasks);
+   * }
+   * ```
+   */
+  appendVariable(name: string, input: ValueInput): ShortcutValue<unknown>;
 
   /**
    * 创建 exists 条件对象，用于 If 控制流判断输入是否存在或是否有值。

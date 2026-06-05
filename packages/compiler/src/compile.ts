@@ -261,10 +261,32 @@ function compileActionParameters(
         WFCommentActionText: String(node.params.text ?? ""),
       };
 
+    case "appendVariable":
+      return {
+        WFInput: compileInput(node.params.input, context),
+        WFVariableName: String(node.params.name ?? ""),
+      };
+
+    case "askForInput":
+      return withUuid(uuid, compileAskForInputParameters(node, context));
+
     case "base64":
       return withUuid(uuid, {
         WFInput: compileInput(node.params.input, context),
         WFEncodeMode: String(node.params.mode ?? "Encode"),
+      });
+
+    case "chooseFromList":
+      return withUuid(uuid, compileChooseFromListParameters(node, context));
+
+    case "delay":
+      return {
+        WFDelayTime: compileParameterValue(node.params.seconds, context),
+      };
+
+    case "detectDictionary":
+      return withUuid(uuid, {
+        WFInput: compileInput(node.params.input, context),
       });
 
     case "dictionary":
@@ -277,10 +299,19 @@ function compileActionParameters(
         ...compileGetContentsOfURLParameters(node, context),
       });
 
+    case "getItemFromList":
+      return withUuid(uuid, compileGetItemFromListParameters(node, context));
+
     case "getValueForKey":
       return withUuid(uuid, {
         WFInput: compileInput(node.params.input, context),
         WFDictionaryKey: compileTextToken(node.params.key, context),
+      });
+
+    case "matchText":
+      return withUuid(uuid, {
+        text: compileTextToken(node.params.input, context),
+        WFMatchTextPattern: compileTextToken(node.params.pattern, context),
       });
 
     case "notification":
@@ -299,6 +330,16 @@ function compileActionParameters(
         "Show-WFInput": true,
       };
 
+    case "openApp":
+      return compileOpenAppParameters(node);
+
+    case "replaceText":
+      return withUuid(uuid, {
+        WFInput: compileTextToken(node.params.input, context),
+        WFReplaceTextFind: compileTextToken(node.params.find, context),
+        WFReplaceTextReplace: compileTextToken(node.params.replace, context),
+      });
+
     case "setVariable":
       return {
         ...(node.params.input === undefined
@@ -313,6 +354,9 @@ function compileActionParameters(
       return {
         WFInput: compileInput(node.params.input, context),
       };
+
+    case "splitText":
+      return withUuid(uuid, compileSplitTextParameters(node, context));
 
     case "text":
       return withUuid(uuid, {
@@ -415,6 +459,163 @@ function compileAttachmentValue(value: ShortcutValue, context: CompileContext): 
   }
 
   throw new Error(`Unsupported shortcut value kind: ${value.kind}`);
+}
+
+/**
+ * 编译普通参数值，并在非变量字面量时保留数字和布尔类型。
+ */
+function compileParameterValue(value: unknown, context: CompileContext): PlistValue {
+  if (isShortcutValue(value)) {
+    return compileShortcutValue(value, context);
+  }
+
+  if (typeof value === "number" || typeof value === "boolean") {
+    return value;
+  }
+
+  return compileTextToken(value, context);
+}
+
+/**
+ * 编译请求输入动作的提示和默认答案参数。
+ */
+function compileAskForInputParameters(
+  node: ShortcutActionNode,
+  context: CompileContext,
+): Record<string, PlistValue> {
+  const options = (node.params.options ?? {}) as {
+    defaultAnswer?: unknown;
+  };
+
+  return {
+    WFAskActionPrompt: compileTextToken(node.params.prompt, context),
+    ...(options.defaultAnswer === undefined
+      ? {}
+      : {
+          WFAskActionDefaultAnswer: compileTextToken(options.defaultAnswer, context),
+        }),
+  };
+}
+
+/**
+ * 编译列表选择动作的输入和提示参数。
+ */
+function compileChooseFromListParameters(
+  node: ShortcutActionNode,
+  context: CompileContext,
+): Record<string, PlistValue> {
+  const options = (node.params.options ?? {}) as {
+    prompt?: unknown;
+  };
+
+  return {
+    WFInput: compileInput(node.params.input, context),
+    ...(options.prompt === undefined
+      ? {}
+      : {
+          WFChooseFromListActionPrompt: compileTextToken(options.prompt, context),
+        }),
+  };
+}
+
+/**
+ * 编译拆分文本动作的输入和分隔符参数。
+ */
+function compileSplitTextParameters(
+  node: ShortcutActionNode,
+  context: CompileContext,
+): Record<string, PlistValue> {
+  const options = (node.params.options ?? {}) as {
+    separator?: string;
+  };
+
+  return {
+    "Show-text": true,
+    text: compileInput(node.params.input, context),
+    WFTextSeparator: options.separator ?? "New Lines",
+  };
+}
+
+/**
+ * 编译从列表取项目动作的输入、取值模式和范围起点参数。
+ */
+function compileGetItemFromListParameters(
+  node: ShortcutActionNode,
+  context: CompileContext,
+): Record<string, PlistValue> {
+  const options = (node.params.options ?? {}) as {
+    mode?: string;
+    start?: unknown;
+  };
+  const mode = options.mode ?? "first";
+  const parameters: Record<string, PlistValue> = {
+    WFInput: compileInput(node.params.input, context),
+    WFItemSpecifier: compileGetItemSpecifier(mode),
+  };
+
+  if (mode === "range") {
+    if (options.start === undefined) {
+      throw new Error("getItemFromList range mode requires a start option.");
+    }
+
+    parameters.WFItemRangeStart = compileParameterValue(options.start, context);
+  }
+
+  return parameters;
+}
+
+/**
+ * 编译从列表取项目动作的取值模式字符串。
+ */
+function compileGetItemSpecifier(mode: string): string {
+  switch (mode) {
+    case "first":
+      return "First Item";
+
+    case "last":
+      return "Last Item";
+
+    case "random":
+      return "Random Item";
+
+    case "range":
+      return "Items in Range";
+
+    default:
+      throw new Error(`Unsupported getItemFromList mode: ${mode}`);
+  }
+}
+
+/**
+ * 编译打开 App 动作的 bundle identifier 和选择 App 参数。
+ */
+function compileOpenAppParameters(node: ShortcutActionNode): Record<string, PlistValue> {
+  const app = node.params.app as
+    | string
+    | {
+        bundleIdentifier?: unknown;
+        name?: unknown;
+        teamIdentifier?: unknown;
+      };
+  const bundleIdentifier =
+    typeof app === "string" ? app : String(app.bundleIdentifier ?? "");
+
+  if (!bundleIdentifier) {
+    throw new Error("openApp requires a bundleIdentifier.");
+  }
+
+  const name = typeof app === "string" ? bundleIdentifier : String(app.name ?? bundleIdentifier);
+  const teamIdentifier =
+    typeof app === "string" ? "0000000000" : String(app.teamIdentifier ?? "0000000000");
+
+  return {
+    WFAppIdentifier: bundleIdentifier,
+    WFSelectedApp: {
+      BundleIdentifier: bundleIdentifier,
+      Name: name,
+      TeamIdentifier: teamIdentifier,
+    },
+  };
 }
 
 /**
