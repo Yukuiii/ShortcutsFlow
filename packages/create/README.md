@@ -1,5 +1,7 @@
 # create-shortcutsflow
 
+[简体中文](README.zh-CN.md)
+
 Project initializer for ShortcutsFlow.
 
 Use this package to scaffold a minimal TypeScript project that builds Apple Shortcuts workflow files with the `shortcutsflow` CLI.

@@ -1,26 +1,26 @@
 # shortcutsflow
 
-[简体中文](README.zh-CN.md)
+[English](README.md)
 
-TypeScript framework and CLI for generating Apple Shortcuts workflow files.
+用于生成 Apple Shortcuts workflow 文件的 TypeScript 框架和 CLI。
 
-ShortcutsFlow compiles a TypeScript shortcut definition into an unsigned `.shortcut` file, plus XML plist and JSON debug output. The generated shortcut can be signed with the macOS `shortcuts` command before sharing or importing.
+ShortcutsFlow 会把 TypeScript 快捷指令定义编译为未签名的 `.shortcut` 文件，同时输出 XML plist 和 JSON 调试文件。生成的快捷指令在分享或导入前，可以使用 macOS 的 `shortcuts` 命令签名。
 
-ShortcutsFlow is not affiliated with Apple.
+ShortcutsFlow 与 Apple 没有关联。
 
-## Requirements
+## 环境要求
 
-- Node.js 20 or newer.
-- macOS with `plutil` for building `.shortcut` files.
-- macOS Shortcuts CLI for `shortcutsflow sign`.
+- Node.js 20 或更新版本。
+- 构建 `.shortcut` 文件需要 macOS 的 `plutil`。
+- `shortcutsflow sign` 需要 macOS Shortcuts CLI。
 
-## Installation
+## 安装
 
 ```bash
 npm install shortcutsflow
 ```
 
-## Define a Shortcut
+## 定义快捷指令
 
 ```ts
 import { defineShortcut, icon } from "shortcutsflow";
@@ -35,9 +35,9 @@ export default defineShortcut({
 });
 ```
 
-## Configure Inputs
+## 配置入口
 
-Create `shortcuts.config.ts` in the project root when you want to run the CLI without passing input files every time.
+如果不想每次执行 CLI 时手动传入入口文件，可以在项目根目录创建 `shortcuts.config.ts`。
 
 ```ts
 export default {
@@ -57,7 +57,7 @@ npx shortcutsflow inspect dist/shortcut.unsigned.shortcut
 npx shortcutsflow sign dist/shortcut.unsigned.shortcut dist/shortcut.shortcut
 ```
 
-`build` writes these files for each shortcut source:
+`build` 会为每个快捷指令源文件写入以下文件：
 
 ```txt
 dist/<name>.unsigned.plist
@@ -65,11 +65,11 @@ dist/<name>.unsigned.json
 dist/<name>.unsigned.shortcut
 ```
 
-## DSL Surface
+## DSL 能力
 
-The package exports the builder DSL, compiler helpers, plist helpers, and icon maps from the top-level module.
+包顶层模块导出 builder DSL、compiler helper、plist helper 和图标映射。
 
-Common builder actions include:
+常用 builder action 包括：
 
 ```txt
 shortcut.comment
@@ -90,11 +90,11 @@ shortcut.repeatEach
 shortcut.chooseFromMenu
 ```
 
-Native action coverage is tracked in [NATIVE_ACTIONS.md](NATIVE_ACTIONS.md).
+Native action 覆盖情况见 [NATIVE_ACTIONS.md](NATIVE_ACTIONS.md)。
 
-## Development
+## 开发
 
-From the monorepo root:
+在 monorepo 根目录执行：
 
 ```bash
 npm install
