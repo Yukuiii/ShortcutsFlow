@@ -56,6 +56,8 @@ export type BuilderShortcutDefinition = {
 
 export type WorkflowBuilder = {
   /**
+   * 注释。
+   *
    * 添加一条 Shortcuts Comment 动作，用于在生成的快捷指令里记录说明，不会产生可供后续动作引用的输出。
    *
    * @example
@@ -68,6 +70,8 @@ export type WorkflowBuilder = {
   comment(text: string): void;
 
   /**
+   * 文本。
+   *
    * 添加 Text 动作并返回该动作的输出引用，后续动作可以直接接收这个引用作为输入。
    *
    * @example
@@ -81,6 +85,8 @@ export type WorkflowBuilder = {
   text(value: ValueInput): ShortcutValue<string>;
 
   /**
+   * 显示结果。
+   *
    * 添加 Show Result 动作，用于在快捷指令运行时展示文本、数字、布尔值或上游 action 输出。
    *
    * @example
@@ -93,6 +99,8 @@ export type WorkflowBuilder = {
   showResult(input: ValueInput): void;
 
   /**
+   * 设定变量。
+   *
    * 添加 Set Variable 动作并返回该运行期命名变量引用，适合显式暴露给后续复杂分支复用。
    *
    * @example
@@ -107,6 +115,8 @@ export type WorkflowBuilder = {
   setVariable(name: string, input?: ValueInput): ShortcutValue<string>;
 
   /**
+   * 词典。
+   *
    * 添加 Dictionary 动作并返回该字典输出引用，可用于配置对象、请求 header 或后续取值。
    *
    * @example
@@ -124,6 +134,8 @@ export type WorkflowBuilder = {
   dictionary(value: ShortcutDictionary): ShortcutValue<ShortcutDictionary>;
 
   /**
+   * URL。
+   *
    * 添加 URL 动作并返回 URL 输出引用，适合传给 Open URL 或 Get Contents of URL。
    *
    * @example
@@ -137,6 +149,8 @@ export type WorkflowBuilder = {
   url(value: ValueInput): ShortcutValue<string>;
 
   /**
+   * 打开 URL。
+   *
    * 添加 Open URL 动作，用于在快捷指令运行时打开 URL 字符串或 URL action 的输出。
    *
    * @example
@@ -150,6 +164,8 @@ export type WorkflowBuilder = {
   openURL(input: ValueInput): void;
 
   /**
+   * 显示通知。
+   *
    * 添加 Show Notification 动作，用于发送系统通知，标题和正文都可以来自上游 action 输出。
    *
    * @example
@@ -163,6 +179,8 @@ export type WorkflowBuilder = {
   notification(title: ValueInput, body?: ValueInput): void;
 
   /**
+   * 获取词典值。
+   *
    * 添加 Get Dictionary Value 动作并返回指定词典 key 的输出引用，适合从 Dictionary action 中读取配置值。
    *
    * @example
@@ -179,6 +197,8 @@ export type WorkflowBuilder = {
   getDictionaryValue(input: ValueInput, key: ValueInput): ShortcutValue<unknown>;
 
   /**
+   * 获取 URL 内容。
+   *
    * 添加 Get Contents of URL 动作并返回远程响应输出引用，支持配置 HTTP method 和 headers。
    *
    * @example
@@ -198,6 +218,8 @@ export type WorkflowBuilder = {
   getContentsOfURL(input: ValueInput, options?: GetContentsOfURLOptions): ShortcutValue<unknown>;
 
   /**
+   * Base64 编码。
+   *
    * 添加 Base64 Encode 动作并返回编码后的文本输出引用。
    *
    * @example
@@ -212,6 +234,8 @@ export type WorkflowBuilder = {
   base64Encode(input: ValueInput): ShortcutValue<string>;
 
   /**
+   * Base64 解码。
+   *
    * 添加 Base64 Decode 动作并返回解码后的文本输出引用。
    *
    * @example
@@ -226,6 +250,8 @@ export type WorkflowBuilder = {
   base64Decode(input: ValueInput): ShortcutValue<string>;
 
   /**
+   * 询问输入。
+   *
    * 添加 Ask for Input 动作并返回用户输入内容。
    *
    * @example
@@ -241,6 +267,8 @@ export type WorkflowBuilder = {
   askForInput(prompt: ValueInput, options?: AskForInputOptions): ShortcutValue<string>;
 
   /**
+   * 从列表中选取。
+   *
    * 添加 Choose from List 动作并返回用户选中的项目。
    *
    * @example
@@ -256,6 +284,8 @@ export type WorkflowBuilder = {
   chooseFromList(input: ValueInput, options?: ChooseFromListOptions): ShortcutValue<unknown>;
 
   /**
+   * 从输入中获取词典。
+   *
    * 添加 Detect Dictionary 动作并返回从输入中识别出的词典。
    *
    * @example
@@ -270,6 +300,8 @@ export type WorkflowBuilder = {
   detectDictionary(input: ValueInput): ShortcutValue<ShortcutDictionary>;
 
   /**
+   * 匹配文本。
+   *
    * 添加 Match Text 动作并返回正则匹配结果。
    *
    * @example
@@ -283,6 +315,8 @@ export type WorkflowBuilder = {
   matchText(input: ValueInput, pattern: ValueInput): ShortcutValue<string[]>;
 
   /**
+   * 拆分文本。
+   *
    * 添加 Split Text 动作并返回拆分后的文本列表。
    *
    * @example
@@ -298,6 +332,8 @@ export type WorkflowBuilder = {
   splitText(input: ValueInput, options?: SplitTextOptions): ShortcutValue<string[]>;
 
   /**
+   * 替换文本。
+   *
    * 添加 Replace Text 动作并返回替换后的文本。
    *
    * @example
@@ -311,6 +347,8 @@ export type WorkflowBuilder = {
   replaceText(input: ValueInput, find: ValueInput, replace: ValueInput): ShortcutValue<string>;
 
   /**
+   * 从列表中获取项目。
+   *
    * 添加 Get Item from List 动作并返回列表中的项目。
    *
    * @example
@@ -326,6 +364,8 @@ export type WorkflowBuilder = {
   getItemFromList(input: ValueInput, options?: GetItemFromListOptions): ShortcutValue<unknown>;
 
   /**
+   * 等待。
+   *
    * 添加 Delay 动作并暂停指定秒数。
    *
    * @example
@@ -339,6 +379,8 @@ export type WorkflowBuilder = {
   delay(seconds: ValueInput): void;
 
   /**
+   * 打开 App。
+   *
    * 添加 Open App 动作并打开指定 bundle identifier 的 App。
    *
    * @example
@@ -354,6 +396,8 @@ export type WorkflowBuilder = {
   openApp(app: OpenAppInput): void;
 
   /**
+   * 添加到变量。
+   *
    * 添加 Append to Variable 动作并把输入追加到运行期命名变量。
    *
    * @example
@@ -368,6 +412,8 @@ export type WorkflowBuilder = {
   appendVariable(name: string, input: ValueInput): ShortcutValue<unknown>;
 
   /**
+   * 如果条件：存在。
+   *
    * 创建 exists 条件对象，用于 If 控制流判断输入是否存在或是否有值。
    *
    * @example
@@ -385,6 +431,8 @@ export type WorkflowBuilder = {
   exists(left: unknown): ShortcutCondition;
 
   /**
+   * 如果条件：等于。
+   *
    * 创建 equals 条件对象，用于 If 控制流比较两个输入是否相等。
    *
    * @example
@@ -402,6 +450,8 @@ export type WorkflowBuilder = {
   equals(left: unknown, right: unknown): ShortcutCondition;
 
   /**
+   * 如果。
+   *
    * 添加 If 控制流，并在 then 或 otherwise 分支中继续使用同一个 builder API 声明动作。
    *
    * @example
@@ -425,6 +475,8 @@ export type WorkflowBuilder = {
   }): void;
 
   /**
+   * 重复每一项。
+   *
    * 添加 Repeat with Each 控制流，并把 body 中声明的动作放入重复体。
    *
    * @example
@@ -443,6 +495,8 @@ export type WorkflowBuilder = {
   repeatEach(input: ValueInput, body: WorkflowBranch): void;
 
   /**
+   * 从菜单中选取。
+   *
    * 添加 Choose from Menu 控制流，每个菜单项对应一个独立的 workflow 分支。
    *
    * @example
