@@ -107,14 +107,13 @@ export default defineShortcut({
       encodedConfigUrl: "aHR0cHM6Ly9leGFtcGxlLmNvbS9jb25maWcuanNvbg==",
     });
     const message = shortcut.text("Hello from TypeScript");
-    const messageVariable = shortcut.setVariable("Message", message);
     const encodedConfigUrl = shortcut.getValueForKey(config, "encodedConfigUrl");
     const configUrl = shortcut.base64Decode(encodedConfigUrl);
     const remoteConfig = shortcut.getContentsOfURL(configUrl);
 
-    shortcut.if(shortcut.exists(messageVariable), {
+    shortcut.if(shortcut.exists(message), {
       then: (shortcut) => {
-        shortcut.notification("Build complete", messageVariable);
+        shortcut.notification("Build complete", message);
       },
     });
 
