@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 
-This is a Node.js 20+ TypeScript monorepo for ShortcutsFlow. Workspace packages live under `packages/`:
+This is a Node.js 20+ TypeScript monorepo with workspaces under `packages/`:
 
 - `packages/shortcutsflow/`: the core DSL, compiler, plist helpers, and `shortcutsflow` CLI.
 - `packages/create/`: the `create-shortcutsflow` project initializer.
@@ -15,7 +15,7 @@ This is a Node.js 20+ TypeScript monorepo for ShortcutsFlow. Workspace packages 
 
 - `npm install`: install workspace dependencies.
 - `npm run build`: run shortcut misuse checks, then build both packages with `tsc -b`.
-- `npm run typecheck`: run project-reference TypeScript checks without test execution.
+- `npm run typecheck`: run project-reference TypeScript checks.
 - `npm test`: build, then run all Node test runner suites.
 - `npm run example:build`: generate the sample unsigned shortcut artifacts.
 - `npm run example:inspect`: inspect the generated sample `.shortcut`.
@@ -23,16 +23,22 @@ This is a Node.js 20+ TypeScript monorepo for ShortcutsFlow. Workspace packages 
 
 ## Coding Style & Naming Conventions
 
-Use TypeScript ESM with explicit `.js` import specifiers in source files. Keep indentation at two spaces and prefer small functions with narrow responsibilities. Public functions and classes should have concise doc comments; match the existing Chinese comment style in TypeScript files. Name action tests after the DSL action, for example `tests/action/get-contents-of-url.test.ts`.
+Use TypeScript ESM with explicit `.js` import specifiers. Keep two-space indentation and prefer small functions. Public functions and classes should have concise doc comments; match the existing Chinese comment style in TypeScript files. Name action tests after the DSL action, for example `tests/action/get-contents-of-url.test.ts`.
 
 ## Testing Guidelines
 
-Tests use Node’s built-in test runner through `tsx --test`. Add focused tests whenever DSL behavior, compiler output, runtime guard rules, or scaffold templates change. Prefer asserting generated Shortcuts plist parameters over snapshotting entire files. Run `npm test` before handing off changes.
+Tests use Node’s built-in test runner through `tsx --test`. Add focused tests whenever DSL behavior, compiler output, runtime guard rules, or scaffold templates change. Prefer asserting generated plist parameters over snapshotting entire files. Run `npm test` before handoff.
 
 ## Commit & Pull Request Guidelines
 
-Recent commits use short imperative subjects such as `Add ...`, `Update ...`, and `Refactor ...`; keep subjects specific and under one line. For PRs, include a concise summary, affected packages, verification commands, and any generated artifact or CLI behavior changes. Link issues when applicable.
+Recent commits use short imperative subjects such as `Add ...`, `Update ...`, and `Refactor ...`; keep subjects specific and one line. For PRs, include a summary, affected packages, verification commands, and generated artifact or CLI behavior changes.
 
 ## Architecture Notes
 
-The main flow is `Builder DSL -> ShortcutNode AST -> WorkflowAction[] -> WorkflowPlist -> XML/binary .shortcut`. Keep compiler changes localized: action metadata and parameter compilation belong in the compiler registry, value references in value compilation helpers, and control-flow flattening in the main compiler.
+The main library lives in `packages/shortcutsflow/src` and follows this flow: `Builder DSL -> ShortcutNode AST -> WorkflowAction[] -> WorkflowPlist -> XML/binary .shortcut`.
+
+- `actions/`: public DSL layer. `builder.ts` executes the user workflow at build time and collects AST nodes; `nodes.ts` exposes lower-level constructors; `types.ts` defines user-facing builder types.
+- `core/`: domain model layer for shortcut metadata, value references, conditions, and icon helpers. Keep plist-specific details out of this layer.
+- `compiler/`: transformation layer. `compile.ts` walks AST nodes and flattens control flow; `action-compilers.ts` maps DSL actions to Shortcuts identifiers and parameters; `values.ts` and `dictionary.ts` encode inputs.
+- `plist/`: serialization layer for XML plist output.
+- `cli/`: command layer for `build`, `check`, `inspect`, and `sign`.
