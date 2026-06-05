@@ -12,6 +12,7 @@
     "clean": "rm -rf packages/*/dist examples/dist",
     "example:build": "tsx packages/cli/src/main.ts build examples/basic-shortcut.ts --out-dir examples/dist",
     "example:inspect": "tsx packages/cli/src/main.ts inspect examples/dist/basic-shortcut.unsigned.shortcut",
+    "test": "npm run build && tsx --test tests/action/*.test.ts",
     "typecheck": "tsc -b tsconfig.build.json --pretty false"
   },
   "devDependencies": {
