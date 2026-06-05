@@ -65,9 +65,9 @@ dist/<name>.unsigned.json
 dist/<name>.unsigned.shortcut
 ```
 
-## API 能力
+## 公开 API
 
-包顶层模块导出稳定的 builder DSL 和图标辅助对象。
+包只从根模块公开稳定的 builder DSL 和图标辅助对象。
 
 常用 builder action 包括：
 
@@ -91,14 +91,6 @@ shortcut.chooseFromMenu
 ```
 
 Native action 覆盖情况见 [NATIVE_ACTIONS.md](NATIVE_ACTIONS.md)。
-
-高级 API 通过明确的子路径导入：
-
-```ts
-import { compileShortcut } from "shortcutsflow/compiler";
-import { serializePlist } from "shortcutsflow/plist";
-import { comment } from "shortcutsflow/actions";
-```
 
 ## 开发
 

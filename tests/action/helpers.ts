@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
-import type { ShortcutDefinition } from "shortcutsflow/core";
-import { compileShortcut, type WorkflowAction } from "shortcutsflow/compiler";
+import type { ShortcutDefinition } from "../../packages/shortcutsflow/src/core/types.ts";
+import { compileShortcut } from "../../packages/shortcutsflow/src/compiler/index.ts";
+import type { WorkflowAction } from "../../packages/shortcutsflow/src/compiler/schema.ts";
 
 export type CompiledAction = WorkflowAction;
 

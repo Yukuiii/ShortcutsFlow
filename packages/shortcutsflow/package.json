@@ -14,22 +14,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./actions": {
-      "types": "./dist/actions/index.d.ts",
-      "default": "./dist/actions/index.js"
-    },
-    "./compiler": {
-      "types": "./dist/compiler/index.d.ts",
-      "default": "./dist/compiler/index.js"
-    },
-    "./core": {
-      "types": "./dist/core/index.d.ts",
-      "default": "./dist/core/index.js"
-    },
-    "./plist": {
-      "types": "./dist/plist/index.d.ts",
-      "default": "./dist/plist/index.js"
     }
   },
   "files": [

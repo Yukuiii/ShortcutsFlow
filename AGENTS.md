@@ -4,7 +4,7 @@
 
 This is a Node.js 20+ TypeScript monorepo with workspaces under `packages/`:
 
-- `packages/shortcutsflow/`: the core DSL, compiler, plist helpers, and `shortcutsflow` CLI.
+- `packages/shortcutsflow/`: public DSL, internal compiler, plist helpers, and `shortcutsflow` CLI.
 - `packages/create/`: the `create-shortcutsflow` project initializer.
 - `tests/action/`: action-level DSL and compiler tests.
 - `tests/create-shortcutsflow.test.ts`: scaffold template tests.
@@ -35,9 +35,9 @@ Recent commits use short imperative subjects such as `Add ...`, `Update ...`, an
 
 ## Architecture Notes
 
-The main library lives in `packages/shortcutsflow/src` and follows this flow: `Builder DSL -> ShortcutNode AST -> WorkflowAction[] -> WorkflowPlist -> XML/binary .shortcut`.
+The main library lives in `packages/shortcutsflow/src` and follows this flow: `Builder DSL -> ShortcutNode AST -> WorkflowAction[] -> WorkflowPlist -> XML/binary .shortcut`. Only the root `shortcutsflow` DSL is public.
 
-- `actions/`: public DSL layer. `builder.ts` executes the user workflow at build time and collects AST nodes; `nodes.ts` exposes lower-level constructors; `types.ts` defines user-facing builder types.
+- `actions/`: DSL layer. `builder.ts` executes the user workflow at build time and collects AST nodes; `nodes.ts` is internal; `types.ts` defines user-facing builder types.
 - `core/`: domain model layer for shortcut metadata, value references, conditions, and icon helpers. Keep plist-specific details out of this layer.
 - `compiler/`: transformation layer. `compile.ts` walks AST nodes and flattens control flow; `action-compilers.ts` maps DSL actions to Shortcuts identifiers and parameters; `values.ts` and `dictionary.ts` encode inputs.
 - `plist/`: serialization layer for XML plist output.

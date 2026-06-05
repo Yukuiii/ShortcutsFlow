@@ -21,8 +21,6 @@ export type {
   ShortcutDictionary,
   ShortcutDictionaryValue,
   ShortcutIcon,
-  ShortcutPrimitive,
-  ShortcutValue,
 } from "./core/types.js";
 export type {
   ShortcutIconColor,
