@@ -14,7 +14,7 @@ export default defineShortcut({
       encodedConfigUrl: "aHR0cHM6Ly9leGFtcGxlLmNvbS9jb25maWcuanNvbg==",
     });
     const message = shortcut.text("Hello from TypeScript");
-    const shortcutUrl = shortcut.url("https://www.icloud.com/shortcuts");
+    const shortcutUrl = shortcut.url("https://www.baidu.com/");
     const configUrl = config.get("encodedConfigUrl").base64Decode();
     const remoteConfig = shortcut.getContentsOfURL(configUrl, {
       method: "GET",

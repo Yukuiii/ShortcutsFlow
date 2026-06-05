@@ -3,7 +3,7 @@ import test from "node:test";
 import { defineShortcut } from "@shortcutsflow/actions";
 import {
   assertActionOutputAttachment,
-  assertVariableAttachment,
+  assertTextTokenVariable,
   compileActions,
   paramsFor,
 } from "./helpers.js";
@@ -22,7 +22,7 @@ test("setVariable 支持只创建空变量", () => {
   assert.equal(parameters.WFVariableName, "Message");
   assert.equal("WFInput" in parameters, false);
   assert.equal("UUID" in parameters, false);
-  assertVariableAttachment(showResult.WFInput, "Message");
+  assertTextTokenVariable(showResult.Text, "Message");
 });
 
 test("setVariable 支持把上游 action 输出写入命名变量", () => {

@@ -16,7 +16,7 @@ test("url 支持字面量 URL 并产生可引用输出", () => {
 
   assert.equal(url.WFURLActionURL, "https://www.icloud.com/shortcuts");
   assertUuid(url);
-  assertActionOutputAttachment(showResult.WFInput, "URL");
+  assertTextTokenActionOutput(showResult.Text, "URL");
 });
 
 test("url 支持上游 action 输出作为 URL 文本", () => {

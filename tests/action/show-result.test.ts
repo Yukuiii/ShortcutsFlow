@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
 import { defineShortcut } from "@shortcutsflow/actions";
-import { assertActionOutputAttachment, compileActions, paramsFor } from "./helpers.js";
+import { assertTextTokenActionOutput, compileActions, paramsFor } from "./helpers.js";
 
 test("showResult 支持字面量输入", () => {
   const actions = compileActions(defineShortcut({
@@ -12,7 +12,7 @@ test("showResult 支持字面量输入", () => {
   }));
   const parameters = paramsFor(actions, "is.workflow.actions.showresult");
 
-  assert.equal(parameters.WFInput, "Build complete");
+  assert.equal(parameters.Text, "Build complete");
   assert.equal("UUID" in parameters, false);
 });
 
@@ -26,5 +26,5 @@ test("showResult 支持上游 action 输出输入", () => {
   }));
   const parameters = paramsFor(actions, "is.workflow.actions.showresult");
 
-  assertActionOutputAttachment(parameters.WFInput, "文本");
+  assertTextTokenActionOutput(parameters.Text, "文本");
 });

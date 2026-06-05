@@ -3,7 +3,7 @@ import test from "node:test";
 import { defineShortcut } from "@shortcutsflow/actions";
 import {
   assertActionOutputAttachment,
-  assertVariableAttachment,
+  assertTextTokenVariable,
   compileActions,
   paramsFor,
 } from "./helpers.js";
@@ -21,7 +21,7 @@ test("appendVariable 支持字面量输入并返回命名变量引用", () => {
 
   assert.equal(append.WFInput, "Task");
   assert.equal(append.WFVariableName, "Items");
-  assertVariableAttachment(showResult.WFInput, "Items");
+  assertTextTokenVariable(showResult.Text, "Items");
 });
 
 test("appendVariable 支持追加上游 action 输出", () => {

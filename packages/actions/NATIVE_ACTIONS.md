@@ -18,7 +18,7 @@
 | `shortcut.text(value)` | Text | `is.workflow.actions.gettext` | `WFTextActionText`, `UUID` | `文本` | 返回值可用 `const message = shortcut.text(...)` 接收。 |
 | `shortcut.dictionary(value)` | Dictionary | `is.workflow.actions.dictionary` | `WFItems`, `UUID` | `词典` | 当前支持基础对象、数组、嵌套对象。 |
 | `shortcut.setVariable(name, input?)` | Set Variable | `is.workflow.actions.setvariable` | `WFVariableName`, `WFInput` | 无 | 用于显式创建 Shortcuts 运行期命名变量；普通链式引用优先用 `const value = shortcut.text(...)`。 |
-| `shortcut.showResult(input)` | Show Result | `is.workflow.actions.showresult` | `WFInput` | 无 | 用于调试和展示最终结果。 |
+| `shortcut.showResult(input)` | Show Result | `is.workflow.actions.showresult` | `Text` | 无 | 用于调试和展示最终结果，变量输入需要编译为 `WFTextTokenString`。 |
 | `shortcut.url(value)` | URL | `is.workflow.actions.url` | `WFURLActionURL`, `UUID` | `URL` | 返回值可用 `const url = shortcut.url(...)` 接收。 |
 | `shortcut.openURL(input)` | Open URLs | `is.workflow.actions.openurl` | `WFInput`, `Show-WFInput` | 无 | 当前默认显示输入。 |
 | `shortcut.notification(title, body?)` | Show Notification | `is.workflow.actions.notification` | `WFNotificationActionTitle`, `WFNotificationActionBody` | 无 | 当前只覆盖标题和正文。 |

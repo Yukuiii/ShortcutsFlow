@@ -39,7 +39,7 @@ test("RuntimeValue 链式文本操作会编译为 Replace Text、Split Text 和 
   assert.equal(split.WFTextSeparator, "Commas");
   assertActionOutputAttachment(getItem.WFInput, "拆分文本");
   assert.equal(getItem.WFItemSpecifier, "First Item");
-  assertActionOutputAttachment(result.WFInput, "来自列表的项目");
+  assertTextTokenActionOutput(result.Text, "来自列表的项目");
 });
 
 test("RuntimeValue 词典取值、Base64 解码和 when 会编译为对应运行期 action", () => {

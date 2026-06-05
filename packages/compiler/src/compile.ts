@@ -352,7 +352,7 @@ function compileActionParameters(
 
     case "showResult":
       return {
-        WFInput: compileInput(node.params.input, context),
+        Text: compileTextToken(node.params.input, context),
       };
 
     case "splitText":
