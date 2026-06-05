@@ -4,15 +4,17 @@ import { execFileSync } from "node:child_process";
 import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { basename, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { tsImport } from "tsx/esm/api";
 import { assertNoRuntimeSyntaxMisuse } from "./runtime-guard.js";
 
 type BuildOptions = {
-  input: string;
-  outDir: string;
+  inputs: string[];
+  outDir?: string;
 };
 
 type ShortcutsConfig = {
   shortcuts?: string[];
+  outputDir?: string;
 };
 
 /**
@@ -47,52 +49,81 @@ async function main(argv: string[]): Promise<void> {
  * 解析 build 命令参数。
  */
 function parseBuildOptions(args: string[]): BuildOptions {
-  const input = args[0];
-
-  if (!input) {
-    throw new Error("Missing input file.");
-  }
-
   const outDirIndex = args.indexOf("--out-dir");
+  const outDir = outDirIndex === -1 ? undefined : args[outDirIndex + 1] ?? "dist";
+  const inputs = outDirIndex === -1
+    ? args
+    : args.filter((_, index) =>
+      index !== outDirIndex &&
+      index !== outDirIndex + 1
+    );
 
   return {
-    input,
-    outDir: outDirIndex === -1 ? "dist" : args[outDirIndex + 1] ?? "dist",
+    inputs,
+    outDir,
   };
 }
 
 /**
- * 构建未签名 shortcut、XML plist 和 JSON 调试文件。
+ * 构建一个或多个未签名 shortcut、XML plist 和 JSON 调试文件。
  */
 async function build(options: BuildOptions): Promise<void> {
-  const inputPath = resolve(options.input);
-  const outDir = resolve(options.outDir);
-  assertNoRuntimeSyntaxMisuse(inputPath);
-  const definition = await loadShortcutDefinition(inputPath);
+  const targets = await resolveBuildTargets(options);
   const { compileShortcut } = await import("@shortcutsflow/compiler");
-  const result = compileShortcut(definition);
-  const fileBase = toKebabCase(result.name);
-  const xmlPath = join(outDir, `${fileBase}.unsigned.plist`);
-  const jsonPath = join(outDir, `${fileBase}.unsigned.json`);
-  const shortcutPath = join(outDir, `${fileBase}.unsigned.shortcut`);
 
-  mkdirSync(outDir, {
-    recursive: true,
-  });
-  writeFileSync(xmlPath, result.xml);
-  writeFileSync(jsonPath, `${JSON.stringify(result.plist, null, 2)}\n`);
-  execFileSync("plutil", [
-    "-convert",
-    "binary1",
-    "-o",
-    shortcutPath,
-    xmlPath,
-  ]);
+  for (const target of targets) {
+    const inputPath = resolve(target.input);
+    const outDir = resolve(target.outDir);
+    assertNoRuntimeSyntaxMisuse(inputPath);
+    const definition = await loadShortcutDefinition(inputPath);
+    const result = compileShortcut(definition);
+    const fileBase = toKebabCase(result.name);
+    const xmlPath = join(outDir, `${fileBase}.unsigned.plist`);
+    const jsonPath = join(outDir, `${fileBase}.unsigned.json`);
+    const shortcutPath = join(outDir, `${fileBase}.unsigned.shortcut`);
 
-  console.log(`Built ${result.name}`);
-  console.log(`  ${xmlPath}`);
-  console.log(`  ${jsonPath}`);
-  console.log(`  ${shortcutPath}`);
+    mkdirSync(outDir, {
+      recursive: true,
+    });
+    writeFileSync(xmlPath, result.xml);
+    writeFileSync(jsonPath, `${JSON.stringify(result.plist, null, 2)}\n`);
+    execFileSync("plutil", [
+      "-convert",
+      "binary1",
+      "-o",
+      shortcutPath,
+      xmlPath,
+    ]);
+
+    console.log(`Built ${result.name}`);
+    console.log(`  ${xmlPath}`);
+    console.log(`  ${jsonPath}`);
+    console.log(`  ${shortcutPath}`);
+  }
+}
+
+/**
+ * 解析 build 命令的实际入口和输出目录。
+ */
+async function resolveBuildTargets(options: BuildOptions): Promise<Array<{
+  input: string;
+  outDir: string;
+}>> {
+  if (options.inputs.length > 0) {
+    return options.inputs.map((input) => ({
+      input,
+      outDir: options.outDir ?? "dist",
+    }));
+  }
+
+  const config = await loadShortcutsConfig("Usage: shortcutsflow build [shortcut.ts ...] [--out-dir dist]");
+  const shortcuts = readConfiguredShortcutInputs(config);
+  const outDir = options.outDir ?? config.outputDir ?? "dist";
+
+  return shortcuts.map((input) => ({
+    input,
+    outDir,
+  }));
 }
 
 /**
@@ -114,14 +145,32 @@ async function check(inputs: string[]): Promise<void> {
  * 从 shortcuts.config.ts 读取默认 shortcut 入口列表。
  */
 async function loadConfiguredShortcutInputs(): Promise<string[]> {
+  const config = await loadShortcutsConfig("Usage: shortcutsflow check [shortcut.ts ...]");
+
+  return readConfiguredShortcutInputs(config);
+}
+
+/**
+ * 从 shortcuts.config.ts 读取默认配置。
+ */
+async function loadShortcutsConfig(usage: string): Promise<ShortcutsConfig> {
   const configPath = resolve("shortcuts.config.ts");
 
   if (!existsSync(configPath)) {
-    throw new Error("Usage: shortcutsflow check <shortcut.ts> [...shortcut.ts]");
+    throw new Error(usage);
   }
 
-  const module = await import(pathToFileURL(configPath).href);
+  const module = await tsImport(pathToFileURL(configPath).href, {
+    parentURL: import.meta.url,
+  });
   const config = module.default as ShortcutsConfig | undefined;
+  return config ?? {};
+}
+
+/**
+ * 从配置对象中读取非空 shortcut 入口列表。
+ */
+function readConfiguredShortcutInputs(config: ShortcutsConfig): string[] {
   const shortcuts = config?.shortcuts ?? [];
 
   if (shortcuts.length === 0) {
@@ -135,7 +184,9 @@ async function loadConfiguredShortcutInputs(): Promise<string[]> {
  * 加载用户导出的快捷指令定义模块。
  */
 async function loadShortcutDefinition(inputPath: string): Promise<ShortcutDefinition> {
-  const module = await import(pathToFileURL(inputPath).href);
+  const module = await tsImport(pathToFileURL(inputPath).href, {
+    parentURL: import.meta.url,
+  });
   const definition = module.default;
 
   if (!definition || typeof definition.workflow !== "function") {
@@ -228,7 +279,7 @@ function printHelp(): void {
   const name = basename(process.argv[1] ?? "shortcutsflow");
 
   console.log(`Usage:
-  ${name} build <shortcut.ts> [--out-dir dist]
+  ${name} build [shortcut.ts ...] [--out-dir dist]
   ${name} check [shortcut.ts ...]
   ${name} inspect <shortcut.shortcut>
   ${name} sign <input.shortcut> <output.shortcut>`);

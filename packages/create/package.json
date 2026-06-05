@@ -1,0 +1,13 @@
+{
+  "name": "create-shortcutsflow",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "create-shortcutsflow": "./dist/main.js"
+  },
+  "main": "./dist/main.js",
+  "types": "./dist/main.d.ts",
+  "files": [
+    "dist"
+  ]
+}

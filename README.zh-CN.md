@@ -28,6 +28,15 @@ npm run example:build
 npm run example:inspect
 ```
 
+初始化一个新的开发者项目：
+
+```bash
+npm create shortcutsflow my-shortcut
+cd my-shortcut
+npm install
+npm run build
+```
+
 生成结果位于：
 
 ```txt
@@ -191,9 +200,13 @@ packages/
   compiler/   # AST -> WFWorkflowActions -> Shortcut plist
   plist/      # plist XML / binary 序列化
   cli/        # build / inspect / sign 命令
+  create/     # npm create shortcutsflow 初始化命令
 
 examples/
   basic-shortcut.ts
+
+developer-project/
+  # npm create shortcutsflow 生成的样例项目
 ```
 
 ## 扩展建议
