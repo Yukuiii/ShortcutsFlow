@@ -1,0 +1,17 @@
+{
+  "name": "@shortcutsflow/compiler",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@shortcutsflow/core": "0.1.0",
+    "@shortcutsflow/plist": "0.1.0"
+  }
+}

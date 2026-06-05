@@ -1,0 +1,14 @@
+{
+  "name": "@shortcutsflow/cli",
+  "version": "0.1.0",
+  "type": "module",
+  "bin": {
+    "shortcutsflow": "./dist/main.js"
+  },
+  "main": "./dist/main.js",
+  "types": "./dist/main.d.ts",
+  "dependencies": {
+    "@shortcutsflow/compiler": "0.1.0",
+    "@shortcutsflow/core": "0.1.0"
+  }
+}
