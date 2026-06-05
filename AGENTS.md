@@ -41,4 +41,4 @@ The main library lives in `packages/shortcutsflow/src` and follows this flow: `B
 - `core/`: domain model layer for shortcut metadata, value references, conditions, and icon helpers. Keep plist-specific details out of this layer.
 - `compiler/`: transformation layer. `compile.ts` walks AST nodes and flattens control flow; `action-compilers.ts` maps DSL actions to Shortcuts identifiers and parameters; `values.ts` and `dictionary.ts` encode inputs.
 - `plist/`: serialization layer for XML plist output.
-- `cli/`: command layer for `build`, `check`, `inspect`, and `sign`.
+- `cli/`: command layer. `main.ts` dispatches commands; `commands/` contains `build`, `check`, `inspect`, and `sign`.

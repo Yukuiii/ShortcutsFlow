@@ -1,5 +1,6 @@
 import { strict as assert } from "node:assert";
-import { compileShortcut, type WorkflowAction, type ShortcutDefinition } from "shortcutsflow";
+import type { ShortcutDefinition } from "shortcutsflow/core";
+import { compileShortcut, type WorkflowAction } from "shortcutsflow/compiler";
 
 export type CompiledAction = WorkflowAction;
 

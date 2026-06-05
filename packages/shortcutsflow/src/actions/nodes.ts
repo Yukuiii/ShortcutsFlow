@@ -33,7 +33,7 @@ function action(actionName: string, params: Record<string, unknown> = {}): Short
  *
  * @example
  * ```ts
- * import { comment } from "shortcutsflow";
+ * import { comment } from "shortcutsflow/actions";
  *
  * const node = comment("Generated from TypeScript.");
  * ```
@@ -49,7 +49,7 @@ export function comment(text: string): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { text } from "shortcutsflow";
+ * import { text } from "shortcutsflow/actions";
  *
  * const node = text("Hello from TypeScript");
  * ```
@@ -65,7 +65,7 @@ export function text(value: ValueInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { showResult } from "shortcutsflow";
+ * import { showResult } from "shortcutsflow/actions";
  *
  * const node = showResult("Build complete");
  * ```
@@ -81,7 +81,7 @@ export function showResult(input: ValueInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { setVariable } from "shortcutsflow";
+ * import { setVariable } from "shortcutsflow/actions";
  *
  * const node = setVariable("Message", "Hello");
  * ```
@@ -98,7 +98,7 @@ export function setVariable(name: string, input?: ValueInput): ShortcutActionNod
  *
  * @example
  * ```ts
- * import { dictionary } from "shortcutsflow";
+ * import { dictionary } from "shortcutsflow/actions";
  *
  * const node = dictionary({
  *   env: "dev",
@@ -118,7 +118,7 @@ export function dictionary(value: ShortcutDictionary): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { url } from "shortcutsflow";
+ * import { url } from "shortcutsflow/actions";
  *
  * const node = url("https://www.icloud.com/shortcuts");
  * ```
@@ -134,7 +134,7 @@ export function url(value: ValueInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { openURL } from "shortcutsflow";
+ * import { openURL } from "shortcutsflow/actions";
  *
  * const node = openURL("https://www.apple.com");
  * ```
@@ -150,7 +150,7 @@ export function openURL(input: ValueInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { notification } from "shortcutsflow";
+ * import { notification } from "shortcutsflow/actions";
  *
  * const node = notification("ShortcutsFlow", "Build complete");
  * ```
@@ -167,7 +167,7 @@ export function notification(title: ValueInput, body?: ValueInput): ShortcutActi
  *
  * @example
  * ```ts
- * import { getDictionaryValue, variable } from "shortcutsflow";
+ * import { getDictionaryValue, variable } from "shortcutsflow/actions";
  *
  * const node = getDictionaryValue(variable("Config"), "endpoint");
  * ```
@@ -184,7 +184,7 @@ export function getDictionaryValue(input: ValueInput, key: ValueInput): Shortcut
  *
  * @example
  * ```ts
- * import { getContentsOfURL } from "shortcutsflow";
+ * import { getContentsOfURL } from "shortcutsflow/actions";
  *
  * const node = getContentsOfURL("https://example.com/config.json", {
  *   method: "GET",
@@ -209,7 +209,7 @@ export function getContentsOfURL(
  *
  * @example
  * ```ts
- * import { base64Encode } from "shortcutsflow";
+ * import { base64Encode } from "shortcutsflow/actions";
  *
  * const node = base64Encode("Hello");
  * ```
@@ -226,7 +226,7 @@ export function base64Encode(input: ValueInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { base64Decode } from "shortcutsflow";
+ * import { base64Decode } from "shortcutsflow/actions";
  *
  * const node = base64Decode("SGVsbG8=");
  * ```
@@ -243,7 +243,7 @@ export function base64Decode(input: ValueInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { askForInput } from "shortcutsflow";
+ * import { askForInput } from "shortcutsflow/actions";
  *
  * const node = askForInput("输入 cookie", {
  *   defaultAnswer: "",
@@ -265,7 +265,7 @@ export function askForInput(
  *
  * @example
  * ```ts
- * import { chooseFromList, variable } from "shortcutsflow";
+ * import { chooseFromList, variable } from "shortcutsflow/actions";
  *
  * const node = chooseFromList(variable("Items"), {
  *   prompt: "选择环境",
@@ -287,7 +287,7 @@ export function chooseFromList(
  *
  * @example
  * ```ts
- * import { detectDictionary, variable } from "shortcutsflow";
+ * import { detectDictionary, variable } from "shortcutsflow/actions";
  *
  * const node = detectDictionary(variable("Response"));
  * ```
@@ -303,7 +303,7 @@ export function detectDictionary(input: ValueInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { matchText } from "shortcutsflow";
+ * import { matchText } from "shortcutsflow/actions";
  *
  * const node = matchText("Cookie: abc", "Cookie: (.+)");
  * ```
@@ -320,7 +320,7 @@ export function matchText(input: ValueInput, pattern: ValueInput): ShortcutActio
  *
  * @example
  * ```ts
- * import { splitText } from "shortcutsflow";
+ * import { splitText } from "shortcutsflow/actions";
  *
  * const node = splitText("hello world", {
  *   separator: "Spaces",
@@ -342,7 +342,7 @@ export function splitText(
  *
  * @example
  * ```ts
- * import { replaceText } from "shortcutsflow";
+ * import { replaceText } from "shortcutsflow/actions";
  *
  * const node = replaceText("hello world", "world", "ShortcutsFlow");
  * ```
@@ -364,7 +364,7 @@ export function replaceText(
  *
  * @example
  * ```ts
- * import { getItemFromList, variable } from "shortcutsflow";
+ * import { getItemFromList, variable } from "shortcutsflow/actions";
  *
  * const node = getItemFromList(variable("Items"), {
  *   mode: "random",
@@ -386,7 +386,7 @@ export function getItemFromList(
  *
  * @example
  * ```ts
- * import { delay } from "shortcutsflow";
+ * import { delay } from "shortcutsflow/actions";
  *
  * const node = delay(3);
  * ```
@@ -402,7 +402,7 @@ export function delay(seconds: ValueInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { openApp } from "shortcutsflow";
+ * import { openApp } from "shortcutsflow/actions";
  *
  * const node = openApp({
  *   bundleIdentifier: "com.apple.shortcuts",
@@ -421,7 +421,7 @@ export function openApp(app: OpenAppInput): ShortcutActionNode {
  *
  * @example
  * ```ts
- * import { appendVariable } from "shortcutsflow";
+ * import { appendVariable } from "shortcutsflow/actions";
  *
  * const node = appendVariable("Tasks", "Task");
  * ```
@@ -438,7 +438,7 @@ export function appendVariable(name: string, input: ValueInput): ShortcutActionN
  *
  * @example
  * ```ts
- * import { if_, showResult, exists, variable } from "shortcutsflow";
+ * import { if_, showResult, exists, variable } from "shortcutsflow/actions";
  *
  * const node = if_(exists(variable("Message")), {
  *   then: [showResult(variable("Message"))],
@@ -466,7 +466,7 @@ export function if_(
  *
  * @example
  * ```ts
- * import { repeatEach, showResult, variable } from "shortcutsflow";
+ * import { repeatEach, showResult, variable } from "shortcutsflow/actions";
  *
  * const node = repeatEach(variable("Items"), [
  *   showResult(variable("Repeat Item")),
@@ -486,7 +486,7 @@ export function repeatEach(input: ValueInput, body: ShortcutNode[]): ShortcutRep
  *
  * @example
  * ```ts
- * import { chooseFromMenu, openURL, showResult } from "shortcutsflow";
+ * import { chooseFromMenu, openURL, showResult } from "shortcutsflow/actions";
  *
  * const node = chooseFromMenu("Choose next action", {
  *   "Show Message": [showResult("Hello")],

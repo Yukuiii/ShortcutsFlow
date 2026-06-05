@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut, compileShortcut } from "shortcutsflow";
+import { defineShortcut } from "shortcutsflow";
+import { compileShortcut } from "shortcutsflow/compiler";
 import {
   actionsWithIdentifier,
   assertActionOutputAttachment,

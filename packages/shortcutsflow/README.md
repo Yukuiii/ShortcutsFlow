@@ -65,9 +65,9 @@ dist/<name>.unsigned.json
 dist/<name>.unsigned.shortcut
 ```
 
-## DSL Surface
+## API Surface
 
-The package exports the builder DSL, compiler helpers, plist helpers, and icon maps from the top-level module.
+The top-level module exports the stable builder DSL and icon helpers.
 
 Common builder actions include:
 
@@ -91,6 +91,14 @@ shortcut.chooseFromMenu
 ```
 
 Native action coverage is tracked in [NATIVE_ACTIONS.md](NATIVE_ACTIONS.md).
+
+Advanced APIs are available from explicit subpaths:
+
+```ts
+import { compileShortcut } from "shortcutsflow/compiler";
+import { serializePlist } from "shortcutsflow/plist";
+import { comment } from "shortcutsflow/actions";
+```
 
 ## Development
 
