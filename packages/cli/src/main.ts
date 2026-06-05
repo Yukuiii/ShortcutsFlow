@@ -1,15 +1,18 @@
 #!/usr/bin/env node
-import { compileShortcut } from "@shortcutsflow/compiler";
 import type { ShortcutDefinition } from "@shortcutsflow/core";
 import { execFileSync } from "node:child_process";
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { basename, dirname, join, resolve } from "node:path";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { basename, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { assertNoRuntimeSyntaxMisuse } from "./runtime-guard.js";
 
 type BuildOptions = {
   input: string;
   outDir: string;
+};
+
+type ShortcutsConfig = {
+  shortcuts?: string[];
 };
 
 /**
@@ -21,6 +24,10 @@ async function main(argv: string[]): Promise<void> {
   switch (command) {
     case "build":
       await build(parseBuildOptions(rest));
+      return;
+
+    case "check":
+      await check(rest);
       return;
 
     case "inspect":
@@ -62,6 +69,7 @@ async function build(options: BuildOptions): Promise<void> {
   const outDir = resolve(options.outDir);
   assertNoRuntimeSyntaxMisuse(inputPath);
   const definition = await loadShortcutDefinition(inputPath);
+  const { compileShortcut } = await import("@shortcutsflow/compiler");
   const result = compileShortcut(definition);
   const fileBase = toKebabCase(result.name);
   const xmlPath = join(outDir, `${fileBase}.unsigned.plist`);
@@ -85,6 +93,42 @@ async function build(options: BuildOptions): Promise<void> {
   console.log(`  ${xmlPath}`);
   console.log(`  ${jsonPath}`);
   console.log(`  ${shortcutPath}`);
+}
+
+/**
+ * 检查一个或多个 shortcut 源文件是否误用了原生 TypeScript 运行期语法。
+ */
+async function check(inputs: string[]): Promise<void> {
+  const shortcutInputs = inputs.length > 0 ? inputs : await loadConfiguredShortcutInputs();
+
+  for (const input of shortcutInputs) {
+    assertNoRuntimeSyntaxMisuse(resolve(input));
+  }
+
+  console.log(
+    `Checked ${shortcutInputs.length} shortcut source file${shortcutInputs.length === 1 ? "" : "s"}.`,
+  );
+}
+
+/**
+ * 从 shortcuts.config.ts 读取默认 shortcut 入口列表。
+ */
+async function loadConfiguredShortcutInputs(): Promise<string[]> {
+  const configPath = resolve("shortcuts.config.ts");
+
+  if (!existsSync(configPath)) {
+    throw new Error("Usage: shortcutsflow check <shortcut.ts> [...shortcut.ts]");
+  }
+
+  const module = await import(pathToFileURL(configPath).href);
+  const config = module.default as ShortcutsConfig | undefined;
+  const shortcuts = config?.shortcuts ?? [];
+
+  if (shortcuts.length === 0) {
+    throw new Error("shortcuts.config.ts must define a non-empty shortcuts array.");
+  }
+
+  return shortcuts;
 }
 
 /**
@@ -185,6 +229,7 @@ function printHelp(): void {
 
   console.log(`Usage:
   ${name} build <shortcut.ts> [--out-dir dist]
+  ${name} check [shortcut.ts ...]
   ${name} inspect <shortcut.shortcut>
   ${name} sign <input.shortcut> <output.shortcut>`);
 }
