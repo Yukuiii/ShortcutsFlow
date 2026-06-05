@@ -3,8 +3,9 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 
 import { basename, dirname, join, resolve } from "node:path";
 
 const packageVersion = readPackageVersion();
+const shortcutName = "Basic Shortcut";
 const shortcutSourcePath = "src/shortcut.ts";
-const shortcutOutputBase = basename(shortcutSourcePath, ".ts");
+const shortcutOutputBase = normalizePackageName(shortcutName);
 
 type ProjectFile = {
   path: string;
@@ -100,7 +101,7 @@ function createProjectFiles(projectName: string): ProjectFile[] {
       contents: `import { defineShortcut, icon } from "shortcutsflow";
 
 export default defineShortcut({
-  name: "Basic Shortcut",
+  name: "${shortcutName}",
   icon: icon.create(icon.color.blue, icon.glyph.shortcuts),
   workflow: (shortcut) => {
     const message = shortcut.text("Hello from ShortcutsFlow");

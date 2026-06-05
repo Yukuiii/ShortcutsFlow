@@ -7,6 +7,7 @@ import type {
   ShortcutValue,
 } from "../core/types.js";
 import {
+  actionOutput,
   equals as createEqualsCondition,
   exists as createExistsCondition,
   variable,
@@ -85,7 +86,7 @@ function outputAction<T>(
       params,
       outputName,
     },
-    output: variable(outputName) as ShortcutValue<T>,
+    output: actionOutput<T>(outputName),
   };
 }
 

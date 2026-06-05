@@ -11,6 +11,20 @@ import {
   paramsFor,
 } from "./helpers.js";
 
+test("RuntimeValue 使用显式 action-output kind 表示上游 action 输出", () => {
+  let kind = "";
+
+  defineShortcut({
+    name: "Runtime Value Kind",
+    workflow: (shortcut) => {
+      const message = shortcut.text("Hello");
+      kind = message.kind;
+    },
+  });
+
+  assert.equal(kind, "action-output");
+});
+
 test("RuntimeValue 链式文本操作会编译为 Replace Text、Split Text 和 Get Item from List", () => {
   const actions = compileActions(defineShortcut({
     name: "Runtime Value Text Chain",

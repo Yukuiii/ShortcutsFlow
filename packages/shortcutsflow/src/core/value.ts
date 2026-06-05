@@ -21,6 +21,16 @@ export function variable(name: string): ShortcutValue<string> {
 }
 
 /**
+ * 创建一个运行期 action output 引用。
+ */
+export function actionOutput<T = unknown>(name: string): ShortcutValue<T> {
+  return {
+    kind: "action-output",
+    value: name as T,
+  };
+}
+
+/**
  * 创建一个运行期变量引用的简写形式。
  */
 export function ref(name: string): ShortcutValue<string> {

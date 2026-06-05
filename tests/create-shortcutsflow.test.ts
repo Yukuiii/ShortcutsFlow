@@ -40,12 +40,15 @@ test("create-shortcutsflow 生成可用的开发者项目模板", () => {
       dependencies: Record<string, string>;
       devDependencies: Record<string, string>;
     };
+    const createPackageJson = JSON.parse(readFileSync("packages/create/package.json", "utf8")) as {
+      version: string;
+    };
 
     assert.equal(packageJson.scripts.build, "shortcutsflow build");
     assert.equal(packageJson.scripts.check, "shortcutsflow check");
     assert.equal(packageJson.scripts.inspect, "shortcutsflow inspect dist/basic-shortcut.unsigned.shortcut");
     assert.equal(packageJson.scripts.sign, "shortcutsflow sign dist/basic-shortcut.unsigned.shortcut dist/basic-shortcut.shortcut");
-    assert.equal(packageJson.dependencies.shortcutsflow, "^0.1.0");
+    assert.equal(packageJson.dependencies.shortcutsflow, `^${createPackageJson.version}`);
     assert.equal(packageJson.devDependencies.typescript, "^5.8.0");
     assert.equal(existsSync(join(project, "shortcuts.config.ts")), true);
     assert.equal(existsSync(join(project, "src/shortcut.ts")), true);
