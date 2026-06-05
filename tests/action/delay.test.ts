@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut } from "shortcutsflow";
 import { assertVariableAttachment, compileActions, paramsFor } from "./helpers.js";
 
 test("delay 支持数字秒数字面量", () => {

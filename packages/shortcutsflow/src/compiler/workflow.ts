@@ -1,4 +1,4 @@
-import type { ResolvedShortcut } from "@shortcutsflow/core";
+import type { ResolvedShortcut } from "../core/types.js";
 import type { WorkflowPlist } from "./schema.js";
 
 const defaultContentItemClasses = [

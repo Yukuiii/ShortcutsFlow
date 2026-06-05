@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut } from "shortcutsflow";
 import { assertActionOutputAttachment, assertTextTokenActionOutput, assertUuid, compileActions, paramsFor } from "./helpers.js";
 
 test("url 支持字面量 URL 并产生可引用输出", () => {

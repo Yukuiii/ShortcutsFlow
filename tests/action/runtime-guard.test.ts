@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { assertNoRuntimeSyntaxMisuse } from "../../packages/cli/src/runtime-guard.ts";
+import { assertNoRuntimeSyntaxMisuse } from "../../packages/shortcutsflow/src/cli/runtime-guard.ts";
 
 /**
  * 写入临时 shortcut 源码并返回文件路径。
@@ -28,7 +28,7 @@ function removeShortcutSource(file: string): void {
 
 test("runtime guard 允许链式 RuntimeValue 和 shortcut.when", () => {
   const file = writeShortcutSource(`
-    import { defineShortcut } from "@shortcutsflow/actions";
+    import { defineShortcut } from "shortcutsflow";
 
     export default defineShortcut({
       name: "Allowed",
@@ -51,7 +51,7 @@ test("runtime guard 允许链式 RuntimeValue 和 shortcut.when", () => {
 
 test("runtime guard 拦截运行期值的原生 if", () => {
   const file = writeShortcutSource(`
-    import { defineShortcut } from "@shortcutsflow/actions";
+    import { defineShortcut } from "shortcutsflow";
 
     export default defineShortcut({
       name: "Native If",
@@ -76,7 +76,7 @@ test("runtime guard 拦截运行期值的原生 if", () => {
 
 test("runtime guard 拦截运行期值的原生相等和加法", () => {
   const file = writeShortcutSource(`
-    import { defineShortcut } from "@shortcutsflow/actions";
+    import { defineShortcut } from "shortcutsflow";
 
     export default defineShortcut({
       name: "Native Operators",

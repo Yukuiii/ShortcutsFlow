@@ -2,19 +2,7 @@
   "files": [],
   "references": [
     {
-      "path": "./packages/core"
-    },
-    {
-      "path": "./packages/actions"
-    },
-    {
-      "path": "./packages/plist"
-    },
-    {
-      "path": "./packages/compiler"
-    },
-    {
-      "path": "./packages/cli"
+      "path": "./packages/shortcutsflow"
     },
     {
       "path": "./packages/create"

@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut } from "shortcutsflow";
 import { assertTextTokenActionOutput, assertUuid, compileActions, paramsFor } from "./helpers.js";
 
 test("matchText 支持字面量输入和正则表达式", () => {

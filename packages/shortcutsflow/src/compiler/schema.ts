@@ -1,4 +1,4 @@
-import type { PlistValue } from "@shortcutsflow/plist";
+import type { PlistValue } from "../plist/index.js";
 
 export type WorkflowAction = {
   WFWorkflowActionIdentifier: string;

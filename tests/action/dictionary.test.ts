@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut } from "shortcutsflow";
 import { asArray, asRecord, assertUuid, compileActions, paramsFor } from "./helpers.js";
 
 test("dictionary 编译基础类型、数组和嵌套对象", () => {

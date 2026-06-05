@@ -1,6 +1,6 @@
 import { strict as assert } from "node:assert";
 import test from "node:test";
-import { defineShortcut } from "@shortcutsflow/actions";
+import { defineShortcut } from "shortcutsflow";
 import { assertActionOutputAttachment, assertUuid, compileActions, paramsFor } from "./helpers.js";
 
 test("detectDictionary 支持字面量 JSON 输入", () => {

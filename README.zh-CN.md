@@ -53,7 +53,7 @@ shortcuts sign --mode anyone --input "examples/dist/basic-shortcut.unsigned.shor
 
 ## 当前 DSL 能力
 
-核心 Native action 对照表见 [packages/actions/NATIVE_ACTIONS.md](packages/actions/NATIVE_ACTIONS.md)。
+核心 Native action 对照表见 [packages/shortcutsflow/NATIVE_ACTIONS.md](packages/shortcutsflow/NATIVE_ACTIONS.md)。
 
 Builder action：
 
@@ -108,8 +108,7 @@ is.workflow.actions.choosefrommenu
 ## 示例
 
 ```ts
-import { defineShortcut } from "@shortcutsflow/actions";
-import { icon } from "@shortcutsflow/core";
+import { defineShortcut, icon } from "shortcutsflow";
 
 export default defineShortcut({
   name: "Basic Shortcut",
@@ -147,8 +146,7 @@ export default defineShortcut({
 导入 `icon` 辅助对象即可使用内置的 Shortcuts 颜色和图标映射：
 
 ```ts
-import { defineShortcut } from "@shortcutsflow/actions";
-import { icon } from "@shortcutsflow/core";
+import { defineShortcut, icon } from "shortcutsflow";
 
 defineShortcut({
   name: "Basic Shortcut",
@@ -179,8 +177,7 @@ defineShortcut({
 如果需要精确复刻 plist fixture，可以使用原始值：
 
 ```ts
-import { defineShortcut } from "@shortcutsflow/actions";
-import { icon } from "@shortcutsflow/core";
+import { defineShortcut, icon } from "shortcutsflow";
 
 defineShortcut({
   name: "Fixture",
@@ -195,11 +192,14 @@ defineShortcut({
 
 ```txt
 packages/
-  core/       # Shortcut AST 和值模型
-  actions/    # 开发者使用的 builder DSL
-  compiler/   # AST -> WFWorkflowActions -> Shortcut plist
-  plist/      # plist XML / binary 序列化
-  cli/        # build / inspect / sign 命令
+  shortcutsflow/
+    src/
+      actions/
+      cli/
+      compiler/
+      core/
+      plist/
+    NATIVE_ACTIONS.md
   create/     # npm create shortcutsflow 初始化命令
 
 examples/

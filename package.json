@@ -1,18 +1,19 @@
 {
-  "name": "shortcutsflow",
+  "name": "shortcutsflow-monorepo",
   "version": "0.1.0",
   "private": true,
   "type": "module",
   "description": "ShortcutsFlow is a TypeScript framework for generating Apple Shortcuts workflow files.",
   "workspaces": [
-    "packages/*"
+    "packages/shortcutsflow",
+    "packages/create"
   ],
   "scripts": {
     "build": "npm run shortcut:check && tsc -b tsconfig.build.json",
     "clean": "rm -rf packages/*/dist examples/dist",
-    "example:build": "tsx packages/cli/src/main.ts build",
-    "example:inspect": "tsx packages/cli/src/main.ts inspect examples/dist/basic-shortcut.unsigned.shortcut",
-    "shortcut:check": "tsx packages/cli/src/main.ts check",
+    "example:build": "tsx packages/shortcutsflow/src/cli/main.ts build",
+    "example:inspect": "tsx packages/shortcutsflow/src/cli/main.ts inspect examples/dist/basic-shortcut.unsigned.shortcut",
+    "shortcut:check": "tsx packages/shortcutsflow/src/cli/main.ts check",
     "test": "npm run build && tsx --test tests/action/*.test.ts tests/*.test.ts",
     "typecheck": "tsc -b tsconfig.build.json --pretty false"
   },
