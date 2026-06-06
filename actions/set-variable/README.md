@@ -5,7 +5,7 @@
 | 字段 | 值 |
 | --- | --- |
 | Native action | Set Variable |
-| Builder DSL | `shortcut.setVariable(name, input?)` |
+| Builder DSL | `shortcut.setVariable(name, input?)` / `shortcut.variable(name, input?)` |
 | Identifier | `is.workflow.actions.setvariable` |
 | 输出 | 命名变量引用 |
 
@@ -21,4 +21,15 @@
 - `name` 编译到 `WFVariableName`。
 - `input` 编译到 `WFInput`，未传入时只创建变量引用。
 - action 本身不写 `UUID`，DSL 返回同名变量引用。
+- `shortcut.variable(name, input?)` 会先生成 Set Variable，并返回支持 `.set(...)` 和 `.append(...)` 的变量引用。
+- 变量引用的 `.set(...)` 继续生成 Set Variable，`.append(...)` 生成 Append to Variable，两者都维护同一个 `WFVariableName`。
 
+## 变量 DSL
+
+```ts
+const message = shortcut.variable("Message", "Hello");
+
+message.set("Updated");
+message.append("Tail");
+shortcut.showResult(message);
+```

@@ -25,9 +25,11 @@ const runtimeValueMethods = new Set([
   "splitText",
   "text",
   "url",
+  "variable",
 ]);
 
 const chainRuntimeMethods = new Set([
+  "append",
   "base64Decode",
   "base64Encode",
   "get",
@@ -35,6 +37,7 @@ const chainRuntimeMethods = new Set([
   "getItem",
   "match",
   "replace",
+  "set",
   "split",
 ]);
 

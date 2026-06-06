@@ -24,6 +24,7 @@ export type {
   HTTPMethod,
   OpenAppInput,
   RuntimeValue,
+  RuntimeVariable,
   ShortcutReference,
   ShowAlertOptions,
   SplitTextOptions,

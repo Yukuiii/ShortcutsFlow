@@ -74,6 +74,32 @@ test("runtime guard 拦截运行期值的原生 if", () => {
   }
 });
 
+test("runtime guard 拦截变量 DSL 运行期值的原生 if", () => {
+  const file = writeShortcutSource(`
+    import { defineShortcut } from "shortcutsflow";
+
+    export default defineShortcut({
+      name: "Variable Native If",
+      workflow: (shortcut) => {
+        const message = shortcut.variable("Message", "Hello");
+        const updated = message.set("Updated");
+        if (updated) {
+          shortcut.showResult(updated);
+        }
+      },
+    });
+  `);
+
+  try {
+    assert.throws(
+      () => assertNoRuntimeSyntaxMisuse(file),
+      /Use shortcut\.if\(value\.exists\(\), \.\.\.\) or shortcut\.when\(value\.exists\(\), \.\.\.\) instead of native if/,
+    );
+  } finally {
+    removeShortcutSource(file);
+  }
+});
+
 test("runtime guard 拦截运行期值的原生相等和加法", () => {
   const file = writeShortcutSource(`
     import { defineShortcut } from "shortcutsflow";

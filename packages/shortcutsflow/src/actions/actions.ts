@@ -25,6 +25,7 @@ export type {
   MenuItems,
   OpenAppInput,
   RuntimeValue,
+  RuntimeVariable,
   SplitTextOptions,
   SplitTextSeparator,
   ValueInput,

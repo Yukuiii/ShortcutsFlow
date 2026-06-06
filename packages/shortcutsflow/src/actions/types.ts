@@ -248,6 +248,22 @@ export type RuntimeValue<T = unknown> = {
   endsWith(right: unknown): ShortcutSingleCondition;
 };
 
+export type RuntimeVariable<T = unknown> = RuntimeValue<T> & {
+  /**
+   * 设置变量。
+   *
+   * 添加 Set Variable 动作并把输入覆盖写入当前运行期命名变量。
+   */
+  set(input?: ValueInput): RuntimeVariable<unknown>;
+
+  /**
+   * 追加到变量。
+   *
+   * 添加 Append to Variable 动作并把输入追加到当前运行期命名变量。
+   */
+  append(input: ValueInput): RuntimeVariable<unknown>;
+};
+
 type RuntimeValueInternalKey = "kind" | "value" | "valueType";
 
 type AssertNoRuntimeValueInternalKeys<T extends never> = T;
@@ -258,6 +274,10 @@ type RuntimeValueInternalKeyCheck = AssertNoRuntimeValueInternalKeys<
 
 type ShortcutReferenceInternalKeyCheck = AssertNoRuntimeValueInternalKeys<
   Extract<keyof ShortcutReference, RuntimeValueInternalKey>
+>;
+
+type RuntimeVariableInternalKeyCheck = AssertNoRuntimeValueInternalKeys<
+  Extract<keyof RuntimeVariable, RuntimeValueInternalKey>
 >;
 
 export type OpenAppInput = string | {
@@ -351,7 +371,23 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  setVariable(name: string, input?: ValueInput): RuntimeValue<string>;
+  setVariable(name: string, input?: ValueInput): RuntimeVariable<unknown>;
+
+  /**
+   * 变量。
+   *
+   * 添加 Set Variable 动作初始化运行期命名变量，并返回可继续 set 或 append 的变量引用。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.variable("Message", "Hello");
+   *   message.append(" World");
+   *   shortcut.showResult(message);
+   * }
+   * ```
+   */
+  variable(name: string, input?: ValueInput): RuntimeVariable<unknown>;
 
   /**
    * 词典。
@@ -650,7 +686,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  appendVariable(name: string, input: ValueInput): RuntimeValue<unknown>;
+  appendVariable(name: string, input: ValueInput): RuntimeVariable<unknown>;
 
   /**
    * 如果条件：存在。

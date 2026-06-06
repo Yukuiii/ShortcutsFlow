@@ -21,7 +21,7 @@ import {
   exists as createExistsCondition,
   isShortcutValue,
   notEquals as createNotEqualsCondition,
-  variable,
+  variable as createVariableReference,
 } from "../core/value.js";
 import { resolveShortcutIcon } from "../core/icon.js";
 import * as actionNodes from "./nodes.js";
@@ -33,6 +33,7 @@ import type {
   GetItemFromListOptions,
   OpenAppInput,
   RuntimeValue,
+  RuntimeVariable,
   ShowAlertOptions,
   SplitTextSeparator,
   SplitTextOptions,
@@ -244,6 +245,30 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
 
     return runtimeValue;
   };
+  const createRuntimeVariable = <T>(name: string): RuntimeVariable<T> => {
+    const runtimeVariable = createRuntimeValue(createVariableReference(name)) as RuntimeVariable<T>;
+
+    if (typeof runtimeVariable.set === "function") {
+      return runtimeVariable;
+    }
+
+    Object.defineProperties(runtimeVariable, {
+      set: {
+        value: (input?: ValueInput): RuntimeVariable<unknown> => {
+          pushAction(actionNodes.setVariable(name, input));
+          return createRuntimeVariable(name);
+        },
+      },
+      append: {
+        value: (input: ValueInput): RuntimeVariable<unknown> => {
+          pushAction(actionNodes.appendVariable(name, input));
+          return createRuntimeVariable(name);
+        },
+      },
+    });
+
+    return runtimeVariable;
+  };
   const collectBranch = (branch: WorkflowBranch): ShortcutNode[] => {
     const branchNodes: ShortcutNode[] = [];
     branch(createWorkflowBuilder(branchNodes, state));
@@ -269,9 +294,13 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     ): void {
       pushAction(actionNodes.showAlert(title, message, options));
     },
-    setVariable(name: string, input?: ValueInput): RuntimeValue<string> {
+    setVariable(name: string, input?: ValueInput): RuntimeVariable<unknown> {
       pushAction(actionNodes.setVariable(name, input));
-      return createRuntimeValue(variable(name));
+      return createRuntimeVariable(name);
+    },
+    variable(name: string, input?: ValueInput): RuntimeVariable<unknown> {
+      pushAction(actionNodes.setVariable(name, input));
+      return createRuntimeVariable(name);
     },
     dictionary(value: ShortcutDictionary): RuntimeValue<ShortcutDictionary> {
       return pushOutputAction("dictionary", {
@@ -379,9 +408,9 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     openApp(app: OpenAppInput): void {
       pushAction(actionNodes.openApp(app));
     },
-    appendVariable(name: string, input: ValueInput): RuntimeValue<unknown> {
+    appendVariable(name: string, input: ValueInput): RuntimeVariable<unknown> {
       pushAction(actionNodes.appendVariable(name, input));
-      return createRuntimeValue(variable(name) as ShortcutValue<unknown>);
+      return createRuntimeVariable(name);
     },
     exists(left: unknown): ShortcutSingleCondition {
       return createExistsCondition(left);

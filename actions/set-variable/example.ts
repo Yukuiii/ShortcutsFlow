@@ -7,8 +7,13 @@ export default defineShortcut({
     const emptyValue = shortcut.setVariable("Message");
     const message = shortcut.text("Hello from ShortcutsFlow");
     const namedMessage = shortcut.setVariable("Message", message);
+    const status = shortcut.variable("Status", "Pending");
+
+    status.set("Running");
+    status.append("Done");
 
     shortcut.showResult(emptyValue);
     shortcut.showResult(namedMessage);
+    shortcut.showResult(status);
   },
 });
