@@ -22,14 +22,32 @@ export type ShortcutValue<T = unknown> = {
   value: T;
 };
 
-export type ShortcutConditionOperator = "exists" | "equals";
+export type ShortcutConditionOperator =
+  | "equals"
+  | "notEquals"
+  | "exists"
+  | "doesNotExist"
+  | "contains"
+  | "doesNotContain"
+  | "beginsWith"
+  | "endsWith";
 
-export type ShortcutCondition = {
+export type ShortcutSingleCondition = {
   kind: "condition";
   operator: ShortcutConditionOperator;
   left: unknown;
   right?: unknown;
 };
+
+export type ShortcutConditionGroupMode = "all" | "any";
+
+export type ShortcutConditionGroup = {
+  kind: "condition-group";
+  mode: ShortcutConditionGroupMode;
+  conditions: ShortcutSingleCondition[];
+};
+
+export type ShortcutCondition = ShortcutSingleCondition | ShortcutConditionGroup;
 
 export type ShortcutActionNode = {
   kind: "action";
@@ -43,6 +61,7 @@ export type ShortcutIfNode = {
   condition: ShortcutCondition;
   then: ShortcutNode[];
   otherwise?: ShortcutNode[];
+  outputName?: string;
 };
 
 export type ShortcutRepeatEachNode = {

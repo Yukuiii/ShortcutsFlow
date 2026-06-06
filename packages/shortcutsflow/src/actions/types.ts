@@ -2,6 +2,7 @@ import type {
   ShortcutCondition,
   ShortcutDictionary,
   ShortcutNode,
+  ShortcutSingleCondition,
   ShortcutValue,
 } from "../core/types.js";
 import type { ShortcutIconInput } from "../core/icon.js";
@@ -184,14 +185,56 @@ export type RuntimeValue<T = unknown> = ShortcutValue<T> & {
    *
    * 创建用于 If 控制流的存在性条件对象。
    */
-  exists(): ShortcutCondition;
+  exists(): ShortcutSingleCondition;
 
   /**
    * 如果条件：等于。
    *
    * 创建用于 If 控制流的相等条件对象。
    */
-  equals(right: unknown): ShortcutCondition;
+  equals(right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：不等于。
+   *
+   * 创建用于 If 控制流的不相等条件对象。
+   */
+  notEquals(right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：没有值。
+   *
+   * 创建用于 If 控制流的无值条件对象。
+   */
+  doesNotExist(): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：包含。
+   *
+   * 创建用于 If 控制流的包含条件对象。
+   */
+  contains(right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：不包含。
+   *
+   * 创建用于 If 控制流的不包含条件对象。
+   */
+  doesNotContain(right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：开头是。
+   *
+   * 创建用于 If 控制流的开头匹配条件对象。
+   */
+  beginsWith(right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：结尾是。
+   *
+   * 创建用于 If 控制流的结尾匹配条件对象。
+   */
+  endsWith(right: unknown): ShortcutSingleCondition;
 };
 
 export type OpenAppInput = string | {
@@ -603,7 +646,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  exists(left: unknown): ShortcutCondition;
+  exists(left: unknown): ShortcutSingleCondition;
 
   /**
    * 如果条件：等于。
@@ -622,18 +665,176 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  equals(left: unknown, right: unknown): ShortcutCondition;
+  equals(left: unknown, right: unknown): ShortcutSingleCondition;
 
   /**
-   * 如果。
+   * 如果条件：不等于。
    *
-   * 添加 If 控制流，并在 then 或 otherwise 分支中继续使用同一个 builder API 声明动作。
+   * 创建 notEquals 条件对象，用于 If 控制流比较两个输入是否不相等。
    *
    * @example
    * ```ts
    * workflow: (shortcut) => {
    *   const message = shortcut.text("Hello");
-   *   shortcut.if(shortcut.exists(message), {
+   *   shortcut.if(shortcut.notEquals(message, "World"), {
+   *     then: (shortcut) => {
+   *       shortcut.showResult(message);
+   *     },
+   *   });
+   * }
+   * ```
+   */
+  notEquals(left: unknown, right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：没有值。
+   *
+   * 创建 doesNotExist 条件对象，用于 If 控制流判断输入是否没有值。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.askForInput("输入文本");
+   *   shortcut.if(shortcut.doesNotExist(message), {
+   *     then: (shortcut) => {
+   *       shortcut.showResult("No value");
+   *     },
+   *   });
+   * }
+   * ```
+   */
+  doesNotExist(left: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：包含。
+   *
+   * 创建 contains 条件对象，用于 If 控制流判断输入是否包含指定文本。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   shortcut.if(shortcut.contains(message, "Hell"), {
+   *     then: (shortcut) => {
+   *       shortcut.showResult(message);
+   *     },
+   *   });
+   * }
+   * ```
+   */
+  contains(left: unknown, right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：不包含。
+   *
+   * 创建 doesNotContain 条件对象，用于 If 控制流判断输入是否不包含指定文本。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   shortcut.if(shortcut.doesNotContain(message, "World"), {
+   *     then: (shortcut) => {
+   *       shortcut.showResult(message);
+   *     },
+   *   });
+   * }
+   * ```
+   */
+  doesNotContain(left: unknown, right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：开头是。
+   *
+   * 创建 beginsWith 条件对象，用于 If 控制流判断输入是否以指定文本开头。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   shortcut.if(shortcut.beginsWith(message, "He"), {
+   *     then: (shortcut) => {
+   *       shortcut.showResult(message);
+   *     },
+   *   });
+   * }
+   * ```
+   */
+  beginsWith(left: unknown, right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件：结尾是。
+   *
+   * 创建 endsWith 条件对象，用于 If 控制流判断输入是否以指定文本结尾。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   shortcut.if(shortcut.endsWith(message, "lo"), {
+   *     then: (shortcut) => {
+   *       shortcut.showResult(message);
+   *     },
+   *   });
+   * }
+   * ```
+   */
+  endsWith(left: unknown, right: unknown): ShortcutSingleCondition;
+
+  /**
+   * 如果条件组：全部满足。
+   *
+   * 创建 all 条件组，用于 If 控制流要求所有子条件同时满足。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   shortcut.if(shortcut.all([
+   *     shortcut.contains(message, "He"),
+   *     shortcut.endsWith(message, "lo"),
+   *   ]), {
+   *     then: (shortcut) => {
+   *       shortcut.showResult(message);
+   *     },
+   *   });
+   * }
+   * ```
+   */
+  all(conditions: ShortcutSingleCondition[]): ShortcutCondition;
+
+  /**
+   * 如果条件组：任一满足。
+   *
+   * 创建 any 条件组，用于 If 控制流要求任一子条件满足。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   shortcut.if(shortcut.any([
+   *     shortcut.equals(message, "Hello"),
+   *     shortcut.equals(message, "Hi"),
+   *   ]), {
+   *     then: (shortcut) => {
+   *       shortcut.showResult(message);
+   *     },
+   *   });
+   * }
+   * ```
+   */
+  any(conditions: ShortcutSingleCondition[]): ShortcutCondition;
+
+  /**
+   * 如果。
+   *
+   * 添加 If 控制流，返回该控制流结束 action 的“如果的结果”引用。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   const result = shortcut.if(shortcut.exists(message), {
    *     then: (shortcut) => {
    *       shortcut.showResult(message);
    *     },
@@ -641,13 +842,14 @@ export type WorkflowBuilder = {
    *       shortcut.notification("No message");
    *     },
    *   });
+   *   shortcut.showResult(result);
    * }
    * ```
    */
   if(condition: ShortcutCondition, branches: {
     then: WorkflowBranch;
     otherwise?: WorkflowBranch;
-  }): void;
+  }): RuntimeValue<unknown>;
 
   /**
    * 如果。

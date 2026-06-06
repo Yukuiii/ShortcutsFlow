@@ -23,9 +23,13 @@ export type {
 } from "./actions/types.js";
 export type {
   ShortcutCondition,
+  ShortcutConditionGroup,
+  ShortcutConditionGroupMode,
+  ShortcutConditionOperator,
   ShortcutDictionary,
   ShortcutDictionaryValue,
   ShortcutIcon,
+  ShortcutSingleCondition,
 } from "./core/types.js";
 export type {
   ShortcutIconColor,

@@ -1,9 +1,17 @@
 export * from "./builder.js";
 export * from "./nodes.js";
 export {
+  all,
+  any,
+  beginsWith,
+  contains,
+  doesNotContain,
+  doesNotExist,
+  endsWith,
   equals,
   exists,
   literal,
+  notEquals,
   ref,
   variable,
 } from "../core/value.js";
@@ -26,8 +34,12 @@ export type {
 export type {
   ShortcutActionNode,
   ShortcutCondition,
+  ShortcutConditionGroup,
+  ShortcutConditionGroupMode,
+  ShortcutConditionOperator,
   ShortcutMenuNode,
   ShortcutNode,
   ShortcutRepeatEachNode,
+  ShortcutSingleCondition,
   ShortcutValue,
 } from "../core/types.js";

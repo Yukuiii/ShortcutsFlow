@@ -3,14 +3,24 @@ import type {
   ShortcutCondition,
   ShortcutDefinition,
   ShortcutDictionary,
+  ShortcutIfNode,
   ShortcutNode,
+  ShortcutSingleCondition,
   ShortcutValue,
 } from "../core/types.js";
 import {
   actionOutput,
+  all as createAllConditionGroup,
+  any as createAnyConditionGroup,
+  beginsWith as createBeginsWithCondition,
+  contains as createContainsCondition,
+  doesNotContain as createDoesNotContainCondition,
+  doesNotExist as createDoesNotExistCondition,
+  endsWith as createEndsWithCondition,
   equals as createEqualsCondition,
   exists as createExistsCondition,
   isShortcutValue,
+  notEquals as createNotEqualsCondition,
   variable,
 } from "../core/value.js";
 import { resolveShortcutIcon } from "../core/icon.js";
@@ -89,6 +99,34 @@ function outputAction<T>(
       outputName,
     },
     output: actionOutput<T>(outputName),
+  };
+}
+
+/**
+ * 创建可被后续 action 引用的 If 控制流节点。
+ */
+function outputIfAction(
+  condition: ShortcutCondition,
+  branches: {
+    then: ShortcutNode[];
+    otherwise?: ShortcutNode[];
+  },
+  state: BuilderState,
+): {
+  node: ShortcutIfNode;
+  output: ShortcutValue<unknown>;
+} {
+  const outputName = `__output_${state.nextOutputIndex++}`;
+
+  return {
+    node: {
+      kind: "if",
+      condition,
+      then: branches.then,
+      otherwise: branches.otherwise,
+      outputName,
+    },
+    output: actionOutput(outputName),
   };
 }
 
@@ -173,10 +211,34 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
           }),
       },
       exists: {
-        value: (): ShortcutCondition => createExistsCondition(runtimeValue),
+        value: (): ShortcutSingleCondition => createExistsCondition(runtimeValue),
       },
       equals: {
-        value: (right: unknown): ShortcutCondition => createEqualsCondition(runtimeValue, right),
+        value: (right: unknown): ShortcutSingleCondition =>
+          createEqualsCondition(runtimeValue, right),
+      },
+      notEquals: {
+        value: (right: unknown): ShortcutSingleCondition =>
+          createNotEqualsCondition(runtimeValue, right),
+      },
+      doesNotExist: {
+        value: (): ShortcutSingleCondition => createDoesNotExistCondition(runtimeValue),
+      },
+      contains: {
+        value: (right: unknown): ShortcutSingleCondition =>
+          createContainsCondition(runtimeValue, right),
+      },
+      doesNotContain: {
+        value: (right: unknown): ShortcutSingleCondition =>
+          createDoesNotContainCondition(runtimeValue, right),
+      },
+      beginsWith: {
+        value: (right: unknown): ShortcutSingleCondition =>
+          createBeginsWithCondition(runtimeValue, right),
+      },
+      endsWith: {
+        value: (right: unknown): ShortcutSingleCondition =>
+          createEndsWithCondition(runtimeValue, right),
       },
     });
 
@@ -321,22 +383,51 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
       pushAction(actionNodes.appendVariable(name, input));
       return createRuntimeValue(variable(name) as ShortcutValue<unknown>);
     },
-    exists(left: unknown): ShortcutCondition {
+    exists(left: unknown): ShortcutSingleCondition {
       return createExistsCondition(left);
     },
-    equals(left: unknown, right: unknown): ShortcutCondition {
+    equals(left: unknown, right: unknown): ShortcutSingleCondition {
       return createEqualsCondition(left, right);
+    },
+    notEquals(left: unknown, right: unknown): ShortcutSingleCondition {
+      return createNotEqualsCondition(left, right);
+    },
+    doesNotExist(left: unknown): ShortcutSingleCondition {
+      return createDoesNotExistCondition(left);
+    },
+    contains(left: unknown, right: unknown): ShortcutSingleCondition {
+      return createContainsCondition(left, right);
+    },
+    doesNotContain(left: unknown, right: unknown): ShortcutSingleCondition {
+      return createDoesNotContainCondition(left, right);
+    },
+    beginsWith(left: unknown, right: unknown): ShortcutSingleCondition {
+      return createBeginsWithCondition(left, right);
+    },
+    endsWith(left: unknown, right: unknown): ShortcutSingleCondition {
+      return createEndsWithCondition(left, right);
+    },
+    all(conditions: ShortcutSingleCondition[]): ShortcutCondition {
+      return createAllConditionGroup(conditions);
+    },
+    any(conditions: ShortcutSingleCondition[]): ShortcutCondition {
+      return createAnyConditionGroup(conditions);
     },
     if(condition: ShortcutCondition, branches: {
       then: WorkflowBranch;
       otherwise?: WorkflowBranch;
-    }): void {
-      nodes.push({
-        kind: "if",
+    }): RuntimeValue<unknown> {
+      const { node, output } = outputIfAction(
         condition,
-        then: collectBranch(branches.then),
-        otherwise: branches.otherwise ? collectBranch(branches.otherwise) : undefined,
-      });
+        {
+          then: collectBranch(branches.then),
+          otherwise: branches.otherwise ? collectBranch(branches.otherwise) : undefined,
+        },
+        state,
+      );
+
+      nodes.push(node);
+      return createRuntimeValue(output);
     },
     when(condition: ShortcutCondition, then: WorkflowBranch): void {
       nodes.push({

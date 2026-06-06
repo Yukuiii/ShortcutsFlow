@@ -3,6 +3,7 @@ import test from "node:test";
 import { defineShortcut } from "shortcutsflow";
 import {
   actionsWithIdentifier,
+  asArray,
   asRecord,
   assertActionOutputAttachment,
   assertTextTokenActionOutput,
@@ -107,4 +108,36 @@ test("RuntimeValue equals 可以直接作为 if 条件", () => {
   assert.equal(conditionals.length, 2);
   assert.equal(start.WFCondition, 4);
   assert.equal(start.WFConditionalActionString, "Hello");
+});
+
+test("RuntimeValue 文本条件可以直接组成多条件 if", () => {
+  const actions = compileActions(defineShortcut({
+    name: "Runtime Value Condition Group",
+    workflow: (shortcut) => {
+      const message = shortcut.text("Hello");
+
+      shortcut.if(shortcut.all([
+        message.contains("Hell"),
+        message.endsWith("lo"),
+      ]), {
+        then: (shortcut) => {
+          shortcut.showResult(message);
+        },
+      });
+    },
+  }));
+  const conditionals = actionsWithIdentifier(actions, "is.workflow.actions.conditional");
+  const start = params(conditionals[0] as never);
+  const conditions = asRecord(start.WFConditions, "condition group should be an object");
+  const value = asRecord(conditions.Value, "condition group value should be an object");
+  const templates = asArray<Record<string, unknown>>(
+    value.WFActionParameterFilterTemplates,
+    "condition group templates should be an array",
+  );
+
+  assert.equal(conditionals.length, 2);
+  assert.equal(conditions.WFSerializationType, "WFContentPredicateTableTemplate");
+  assert.equal(value.WFActionParameterFilterPrefix, 0);
+  assert.equal(templates.length, 2);
+  assert.equal(templates[0]?.WFCondition, 99);
 });

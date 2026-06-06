@@ -6,7 +6,7 @@ export default defineShortcut({
   workflow: (shortcut) => {
     const message = shortcut.text("Hello");
 
-    shortcut.if(shortcut.exists(message), {
+    const ifResult = shortcut.if(shortcut.exists(message), {
       then: (shortcut) => {
         shortcut.showResult(message);
       },
@@ -15,10 +15,24 @@ export default defineShortcut({
       },
     });
 
+    shortcut.showResult(ifResult);
+
     shortcut.if(shortcut.equals(message, "Hello"), {
       then: (shortcut) => {
         shortcut.showAlert("Matched", message);
       },
     });
+
+    shortcut.if(
+      shortcut.all([
+        message.contains("Hell"), // runtime value
+        shortcut.endsWith(message, "lo"),
+      ]),
+      {
+        then: (shortcut) => {
+          shortcut.showResult("All conditions matched");
+        },
+      },
+    );
   },
 });

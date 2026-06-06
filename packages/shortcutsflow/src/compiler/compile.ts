@@ -6,6 +6,7 @@ import {
   type ShortcutMenuNode,
   type ShortcutNode,
   type ShortcutRepeatEachNode,
+  type ShortcutSingleCondition,
 } from "../core/types.js";
 import { resolveShortcut } from "../core/shortcut.js";
 import { serializePlist, type PlistValue } from "../plist/index.js";
@@ -98,6 +99,7 @@ function compileActionNode(node: ShortcutActionNode, context: CompileContext): W
  */
 function compileIfNode(node: ShortcutIfNode, context: CompileContext): WorkflowAction[] {
   const groupingIdentifier = randomUUID().toUpperCase();
+  const endUuid = randomUUID().toUpperCase();
   const actions: WorkflowAction[] = [
     workflowAction("is.workflow.actions.conditional", {
       ...compileCondition(node.condition, context),
@@ -121,9 +123,16 @@ function compileIfNode(node: ShortcutIfNode, context: CompileContext): WorkflowA
     workflowAction("is.workflow.actions.conditional", {
       GroupingIdentifier: groupingIdentifier,
       WFControlFlowMode: 2,
-      UUID: randomUUID().toUpperCase(),
+      UUID: endUuid,
     }),
   );
+
+  if (node.outputName) {
+    context.outputs.set(node.outputName, {
+      outputName: "如果的结果",
+      uuid: endUuid,
+    });
+  }
 
   return actions;
 }
@@ -208,19 +217,75 @@ function compileCondition(
   condition: ShortcutCondition,
   context: CompileContext,
 ): Record<string, PlistValue> {
-  switch (condition.operator) {
-    case "exists":
-      return {
-        WFInput: compileConditionInput(condition.left, context),
-        WFCondition: 100,
-      };
+  if (condition.kind === "condition-group") {
+    if (condition.conditions.length === 0) {
+      throw new Error("If condition group must contain at least one condition");
+    }
 
+    return {
+      WFConditions: {
+        Value: {
+          WFActionParameterFilterPrefix: condition.mode === "all" ? 0 : 1,
+          WFContentPredicateBoundedDate: false,
+          WFActionParameterFilterTemplates: condition.conditions.map((item) =>
+            compileSingleCondition(item, context),
+          ),
+        },
+        WFSerializationType: "WFContentPredicateTableTemplate",
+      },
+    };
+  }
+
+  return compileSingleCondition(condition, context);
+}
+
+/**
+ * 编译单个 If 条件为 Shortcuts conditional 参数。
+ */
+function compileSingleCondition(
+  condition: ShortcutSingleCondition,
+  context: CompileContext,
+): Record<string, PlistValue> {
+  const parameters: Record<string, PlistValue> = {
+    WFInput: compileConditionInput(condition.left, context),
+    WFCondition: conditionCode(condition),
+  };
+
+  if (condition.right !== undefined) {
+    parameters.WFConditionalActionString = compileTextToken(condition.right, context);
+  }
+
+  return parameters;
+}
+
+/**
+ * 读取 Shortcuts If 条件编号。
+ */
+function conditionCode(condition: ShortcutSingleCondition): number {
+  switch (condition.operator) {
     case "equals":
-      return {
-        WFInput: compileConditionInput(condition.left, context),
-        WFConditionalActionString: compileTextToken(condition.right, context),
-        WFCondition: 4,
-      };
+      return 4;
+
+    case "notEquals":
+      return 5;
+
+    case "exists":
+      return 100;
+
+    case "doesNotExist":
+      return 101;
+
+    case "contains":
+      return 99;
+
+    case "doesNotContain":
+      return 999;
+
+    case "beginsWith":
+      return 8;
+
+    case "endsWith":
+      return 9;
 
     default:
       throw new Error(`Unsupported condition operator: ${condition.operator}`);
