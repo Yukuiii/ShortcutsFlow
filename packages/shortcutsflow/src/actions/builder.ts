@@ -10,6 +10,7 @@ import {
   actionOutput,
   equals as createEqualsCondition,
   exists as createExistsCondition,
+  isShortcutValue,
   variable,
 } from "../core/value.js";
 import { resolveShortcutIcon } from "../core/icon.js";
@@ -254,12 +255,14 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
       });
     },
     askForInput(
-      prompt: ValueInput,
+      promptOrOptions?: ValueInput | AskForInputOptions,
       options: AskForInputOptions = {},
     ): RuntimeValue<string> {
+      const normalized = normalizeAskForInputArguments(promptOrOptions, options);
+
       return pushOutputAction("askForInput", {
-        prompt,
-        options,
+        prompt: normalized.prompt,
+        options: normalized.options,
       });
     },
     chooseFromList(
@@ -360,6 +363,35 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
       });
     },
   };
+}
+
+/**
+ * 规范化 askForInput 的 prompt+options 和 options-only 两种调用形式。
+ */
+function normalizeAskForInputArguments(
+  promptOrOptions: ValueInput | AskForInputOptions | undefined,
+  options: AskForInputOptions,
+): {
+  prompt?: ValueInput;
+  options: AskForInputOptions;
+} {
+  return isAskForInputOptions(promptOrOptions)
+    ? {
+        options: promptOrOptions,
+      }
+    : {
+        prompt: promptOrOptions,
+        options,
+      };
+}
+
+/**
+ * 判断第一个 askForInput 参数是否为 options 对象。
+ */
+function isAskForInputOptions(
+  value: ValueInput | AskForInputOptions | undefined,
+): value is AskForInputOptions {
+  return typeof value === "object" && value !== null && !isShortcutValue(value);
 }
 
 /**

@@ -3,6 +3,10 @@ export { icon } from "./core/icon.js";
 export { ref } from "./core/value.js";
 export type {
   AskForInputOptions,
+  AskForInputInputType,
+  AskForInputNumberOptions,
+  AskForInputTextOptions,
+  AskForInputTypedOptions,
   BuilderShortcutDefinition,
   ChooseFromListOptions,
   GetContentsOfURLOptions,

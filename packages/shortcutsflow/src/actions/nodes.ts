@@ -238,7 +238,7 @@ export function base64Decode(input: ValueInput): ShortcutActionNode {
 }
 
 /**
- * 创建 Shortcuts Ask for Input 动作节点，适合直接构造 AST 时请求用户输入文本。
+ * 创建 Shortcuts Ask for Input 动作节点，适合直接构造 AST 时请求用户输入。
  *
  * @example
  * ```ts
@@ -248,7 +248,7 @@ export function base64Decode(input: ValueInput): ShortcutActionNode {
  * ```
  */
 export function askForInput(
-  prompt: ValueInput,
+  prompt?: ValueInput,
   options: AskForInputOptions = {},
 ): ShortcutActionNode {
   return action("askForInput", {

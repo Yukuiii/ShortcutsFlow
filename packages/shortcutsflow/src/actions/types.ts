@@ -15,9 +15,30 @@ export type GetContentsOfURLOptions = {
   headers?: ShortcutDictionary;
 };
 
-export type AskForInputOptions = {
+export type AskForInputInputType = "Text" | "Number" | "URL" | "Date" | "Date and Time" | "Time";
+
+export type AskForInputTextOptions = {
+  inputType?: "Text";
+  defaultAnswer?: ValueInput;
+  allowMultipleLines?: boolean;
+};
+
+export type AskForInputNumberOptions = {
+  inputType: "Number";
+  defaultAnswer?: ValueInput;
+  allowDecimal?: boolean;
+  allowNegative?: boolean;
+};
+
+export type AskForInputTypedOptions = {
+  inputType: Exclude<AskForInputInputType, "Text" | "Number">;
   defaultAnswer?: ValueInput;
 };
+
+export type AskForInputOptions =
+  | AskForInputTextOptions
+  | AskForInputNumberOptions
+  | AskForInputTypedOptions;
 
 export type ChooseFromListOptions = {
   prompt?: ValueInput;
@@ -352,12 +373,14 @@ export type WorkflowBuilder = {
    * workflow: (shortcut) => {
    *   const cookie = shortcut.askForInput("输入 cookie", {
    *     defaultAnswer: "",
+   *     allowMultipleLines: false,
    *   });
    *   shortcut.showResult(cookie);
    * }
    * ```
    */
   askForInput(prompt: ValueInput, options?: AskForInputOptions): RuntimeValue<string>;
+  askForInput(options?: AskForInputOptions): RuntimeValue<string>;
 
   /**
    * 从列表中选取。

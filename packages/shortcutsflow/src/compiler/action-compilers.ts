@@ -427,17 +427,48 @@ function compileAskForInputParameters(
   context: CompileContext,
 ): Record<string, PlistValue> {
   const options = (node.params.options ?? {}) as {
+    inputType?: string;
     defaultAnswer?: unknown;
+    allowMultipleLines?: boolean;
+    allowDecimal?: boolean;
+    allowNegative?: boolean;
   };
-
-  return {
-    WFAskActionPrompt: compileTextToken(node.params.prompt, context),
+  const parameters: Record<string, PlistValue> = {
+    ...(node.params.prompt === undefined
+      ? {}
+      : {
+          WFAskActionPrompt: compileTextToken(node.params.prompt, context),
+        }),
+    ...(options.inputType && options.inputType !== "Text"
+      ? {
+          WFInputType: options.inputType,
+        }
+      : {}),
     ...(options.defaultAnswer === undefined
       ? {}
       : {
           WFAskActionDefaultAnswer: compileTextToken(options.defaultAnswer, context),
         }),
   };
+
+  if (
+    (options.inputType === undefined || options.inputType === "Text") &&
+    options.allowMultipleLines !== undefined
+  ) {
+    parameters.WFAllowsMultilineText = options.allowMultipleLines;
+  }
+
+  if (options.inputType === "Number") {
+    if (options.allowDecimal !== undefined) {
+      parameters.WFAskActionAllowsDecimalNumbers = options.allowDecimal;
+    }
+
+    if (options.allowNegative !== undefined) {
+      parameters.WFAskActionAllowsNegativeNumbers = options.allowNegative;
+    }
+  }
+
+  return parameters;
 }
 
 /**

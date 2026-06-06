@@ -18,6 +18,7 @@
 | `shortcut.text(value)` | Text | `is.workflow.actions.gettext` | `WFTextActionText`, `UUID` | `文本` | 返回值可用 `const message = shortcut.text(...)` 接收。 |
 | `shortcut.dictionary(value)` | Dictionary | `is.workflow.actions.dictionary` | `WFItems`, `UUID` | `词典` | 当前支持基础对象、数组、嵌套对象。 |
 | `shortcut.setVariable(name, input?)` | Set Variable | `is.workflow.actions.setvariable` | `WFVariableName`, `WFInput` | 无 | 用于显式创建 Shortcuts 运行期命名变量；普通链式引用优先用 `const value = shortcut.text(...)`。 |
+| `shortcut.askForInput(promptOrOptions?, options?)` | Ask for Input | `is.workflow.actions.ask` | `WFAskActionPrompt`, `WFAskActionDefaultAnswer`, `WFInputType`, `WFAllowsMultilineText`, `WFAskActionAllowsDecimalNumbers`, `WFAskActionAllowsNegativeNumbers`, `UUID` | `提供的输入` | 支持文本、数字、URL、日期、日期时间和时间输入。 |
 | `shortcut.showResult(input)` | Show Result | `is.workflow.actions.showresult` | `Text` | 无 | 用于调试和展示最终结果，变量输入需要编译为 `WFTextTokenString`。 |
 | `shortcut.showAlert(title, message, options?)` | Show Alert | `is.workflow.actions.alert` | `WFAlertActionTitle`, `WFAlertActionMessage`, `WFAlertActionCancelButtonShown` | 无 | 用于弹出阻塞式提醒，支持控制是否显示取消按钮。 |
 | `shortcut.url(value)` | URL | `is.workflow.actions.url` | `WFURLActionURL`, `UUID` | `URL` | 返回值可用 `const url = shortcut.url(...)` 接收。 |
@@ -37,7 +38,6 @@
 
 | 建议 DSL | Native action | Identifier | 关键参数 | 优先级 | 备注 |
 | --- | --- | --- | --- | --- | --- |
-| `askForInput(options)` | Ask for Input | `is.workflow.actions.ask` | 待 fixture 确认 | P0 | 交互式流程核心动作。 |
 | `chooseFromList(input, options?)` | Choose from List | `is.workflow.actions.choosefromlist` | `WFInput`, `WFChooseFromListActionPrompt`, `UUID` | P0 | 与菜单不同，输入来自列表。 |
 | `getItemFromList(input, specifier)` | Get Item from List | `is.workflow.actions.getitemfromlist` | `WFInput`, `WFItemSpecifier`, `WFItemRangeStart`, `UUID` | P0 | 列表处理核心动作。 |
 | `appendVariable(name, input)` | Add to Variable | `is.workflow.actions.appendvariable` | `WFVariableName`, `WFInput` | P0 | 构建列表/聚合结果常用。 |

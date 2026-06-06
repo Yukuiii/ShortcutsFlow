@@ -71,6 +71,7 @@ shortcut.getDictionaryValue
 shortcut.getContentsOfURL
 shortcut.base64Encode
 shortcut.base64Decode
+shortcut.askForInput
 ```
 
 Control flow:
