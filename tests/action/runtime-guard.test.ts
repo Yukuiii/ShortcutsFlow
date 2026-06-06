@@ -26,7 +26,7 @@ function removeShortcutSource(file: string): void {
   });
 }
 
-test("runtime guard 允许链式 RuntimeValue 和 shortcut.when", () => {
+test("runtime guard 允许链式 ShortcutValueRef 和 shortcut.when", () => {
   const file = writeShortcutSource(`
     import { defineShortcut } from "shortcutsflow";
 

@@ -53,5 +53,5 @@
 
 - `text` 编译到 `WFCommentActionText`。
 - 字面量输入直接写入 `WFCommentActionText`。
-- `RuntimeValue` 输入编译为 `WFTextTokenString`。
+- `ShortcutValueRef` 输入编译为 `WFTextTokenString`。
 - `Comment` 不产生运行期输出，因此不需要 `UUID`。

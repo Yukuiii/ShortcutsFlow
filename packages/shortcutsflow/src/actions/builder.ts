@@ -33,8 +33,8 @@ import type {
   GetContentsOfURLOptions,
   GetItemFromListOptions,
   OpenAppInput,
-  RuntimeValue,
-  RuntimeVariable,
+  ShortcutValueRef,
+  ShortcutVariableRef,
   ShowAlertOptions,
   SplitTextSeparator,
   SplitTextOptions,
@@ -144,141 +144,141 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
   const pushOutputAction = <T>(
     actionName: string,
     params: Record<string, unknown>,
-  ): RuntimeValue<T> => {
+  ): ShortcutValueRef<T> => {
     const { node, output } = outputAction<T>(actionName, params, state);
     nodes.push(node);
-    return createRuntimeValue(output);
+    return createShortcutValueRef(output);
   };
-  const createRuntimeValue = <T>(value: ShortcutValue<T>): RuntimeValue<T> => {
-    const runtimeValue = value as unknown as RuntimeValue<T>;
+  const createShortcutValueRef = <T>(value: ShortcutValue<T>): ShortcutValueRef<T> => {
+    const shortcutValueRef = value as unknown as ShortcutValueRef<T>;
 
-    if (typeof runtimeValue.exists === "function") {
-      return runtimeValue;
+    if (typeof shortcutValueRef.exists === "function") {
+      return shortcutValueRef;
     }
 
-    Object.defineProperties(runtimeValue, {
+    Object.defineProperties(shortcutValueRef, {
       replace: {
-        value: (find: ValueInput, replace: ValueInput): RuntimeValue<string> =>
+        value: (find: ValueInput, replace: ValueInput): ShortcutValueRef<string> =>
           pushOutputAction("replaceText", {
-            input: runtimeValue,
+            input: shortcutValueRef,
             find,
             replace,
           }),
       },
       split: {
-        value: (separator?: SplitTextSeparator | SplitTextOptions): RuntimeValue<string[]> =>
+        value: (separator?: SplitTextSeparator | SplitTextOptions): ShortcutValueRef<string[]> =>
           pushOutputAction("splitText", {
-            input: runtimeValue,
+            input: shortcutValueRef,
             options: normalizeSplitOptions(separator),
           }),
       },
       match: {
-        value: (pattern: ValueInput): RuntimeValue<string[]> =>
+        value: (pattern: ValueInput): ShortcutValueRef<string[]> =>
           pushOutputAction("matchText", {
-            input: runtimeValue,
+            input: shortcutValueRef,
             pattern,
           }),
       },
       getDictionaryValue: {
         value: <TKey extends ValueInput>(
           key: TKey,
-        ): RuntimeValue<DictionaryValueFor<RuntimeValue<T>, TKey>> =>
-          pushOutputAction<DictionaryValueFor<RuntimeValue<T>, TKey>>("getDictionaryValue", {
-            input: runtimeValue,
+        ): ShortcutValueRef<DictionaryValueFor<ShortcutValueRef<T>, TKey>> =>
+          pushOutputAction<DictionaryValueFor<ShortcutValueRef<T>, TKey>>("getDictionaryValue", {
+            input: shortcutValueRef,
             key,
           }),
       },
       get: {
         value: <TKey extends ValueInput>(
           key: TKey,
-        ): RuntimeValue<DictionaryValueFor<RuntimeValue<T>, TKey>> =>
-          pushOutputAction<DictionaryValueFor<RuntimeValue<T>, TKey>>("getDictionaryValue", {
-            input: runtimeValue,
+        ): ShortcutValueRef<DictionaryValueFor<ShortcutValueRef<T>, TKey>> =>
+          pushOutputAction<DictionaryValueFor<ShortcutValueRef<T>, TKey>>("getDictionaryValue", {
+            input: shortcutValueRef,
             key,
           }),
       },
       getItem: {
         value: (
           options: GetItemFromListOptions = {},
-        ): RuntimeValue<ValueInputListItem<RuntimeValue<T>>> =>
-          pushOutputAction<ValueInputListItem<RuntimeValue<T>>>("getItemFromList", {
-            input: runtimeValue,
+        ): ShortcutValueRef<ValueInputListItem<ShortcutValueRef<T>>> =>
+          pushOutputAction<ValueInputListItem<ShortcutValueRef<T>>>("getItemFromList", {
+            input: shortcutValueRef,
             options,
           }),
       },
       base64Encode: {
-        value: (): RuntimeValue<string> =>
+        value: (): ShortcutValueRef<string> =>
           pushOutputAction("base64", {
-            input: runtimeValue,
+            input: shortcutValueRef,
             mode: "Encode",
           }),
       },
       base64Decode: {
-        value: (): RuntimeValue<string> =>
+        value: (): ShortcutValueRef<string> =>
           pushOutputAction("base64", {
-            input: runtimeValue,
+            input: shortcutValueRef,
             mode: "Decode",
           }),
       },
       exists: {
-        value: (): ShortcutSingleCondition => createExistsCondition(runtimeValue),
+        value: (): ShortcutSingleCondition => createExistsCondition(shortcutValueRef),
       },
       equals: {
         value: (right: unknown): ShortcutSingleCondition =>
-          createEqualsCondition(runtimeValue, right),
+          createEqualsCondition(shortcutValueRef, right),
       },
       notEquals: {
         value: (right: unknown): ShortcutSingleCondition =>
-          createNotEqualsCondition(runtimeValue, right),
+          createNotEqualsCondition(shortcutValueRef, right),
       },
       doesNotExist: {
-        value: (): ShortcutSingleCondition => createDoesNotExistCondition(runtimeValue),
+        value: (): ShortcutSingleCondition => createDoesNotExistCondition(shortcutValueRef),
       },
       contains: {
         value: (right: unknown): ShortcutSingleCondition =>
-          createContainsCondition(runtimeValue, right),
+          createContainsCondition(shortcutValueRef, right),
       },
       doesNotContain: {
         value: (right: unknown): ShortcutSingleCondition =>
-          createDoesNotContainCondition(runtimeValue, right),
+          createDoesNotContainCondition(shortcutValueRef, right),
       },
       beginsWith: {
         value: (right: unknown): ShortcutSingleCondition =>
-          createBeginsWithCondition(runtimeValue, right),
+          createBeginsWithCondition(shortcutValueRef, right),
       },
       endsWith: {
         value: (right: unknown): ShortcutSingleCondition =>
-          createEndsWithCondition(runtimeValue, right),
+          createEndsWithCondition(shortcutValueRef, right),
       },
     });
 
-    return runtimeValue;
+    return shortcutValueRef;
   };
-  const createRuntimeVariable = <T>(name: string): RuntimeVariable<T> => {
-    const runtimeVariable = createRuntimeValue(createVariableReference(name)) as RuntimeVariable<T>;
+  const createShortcutVariableRef = <T>(name: string): ShortcutVariableRef<T> => {
+    const shortcutVariableRef = createShortcutValueRef(createVariableReference(name)) as ShortcutVariableRef<T>;
 
-    if (typeof runtimeVariable.set === "function") {
-      return runtimeVariable;
+    if (typeof shortcutVariableRef.set === "function") {
+      return shortcutVariableRef;
     }
 
-    Object.defineProperties(runtimeVariable, {
+    Object.defineProperties(shortcutVariableRef, {
       set: {
         value: <TInput extends ValueInput | undefined = undefined>(
           input?: TInput,
-        ): RuntimeVariable<ValueInputValue<TInput>> => {
+        ): ShortcutVariableRef<ValueInputValue<TInput>> => {
           pushAction(actionNodes.setVariable(name, input));
-          return createRuntimeVariable<ValueInputValue<TInput>>(name);
+          return createShortcutVariableRef<ValueInputValue<TInput>>(name);
         },
       },
       append: {
-        value: (input: ValueInput): RuntimeVariable<unknown> => {
+        value: (input: ValueInput): ShortcutVariableRef<unknown> => {
           pushAction(actionNodes.appendVariable(name, input));
-          return createRuntimeVariable(name);
+          return createShortcutVariableRef(name);
         },
       },
     });
 
-    return runtimeVariable;
+    return shortcutVariableRef;
   };
   const collectBranch = (branch: WorkflowBranch): ShortcutNode[] => {
     const branchNodes: ShortcutNode[] = [];
@@ -290,7 +290,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     comment(textValue: ValueInput): void {
       pushAction(actionNodes.comment(textValue));
     },
-    text(value: ValueInput): RuntimeValue<string> {
+    text(value: ValueInput): ShortcutValueRef<string> {
       return pushOutputAction("text", {
         value,
       });
@@ -308,23 +308,23 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     setVariable<TInput extends ValueInput | undefined = undefined>(
       name: string,
       input?: TInput,
-    ): RuntimeVariable<ValueInputValue<TInput>> {
+    ): ShortcutVariableRef<ValueInputValue<TInput>> {
       pushAction(actionNodes.setVariable(name, input));
-      return createRuntimeVariable<ValueInputValue<TInput>>(name);
+      return createShortcutVariableRef<ValueInputValue<TInput>>(name);
     },
     variable<TInput extends ValueInput | undefined = undefined>(
       name: string,
       input?: TInput,
-    ): RuntimeVariable<ValueInputValue<TInput>> {
+    ): ShortcutVariableRef<ValueInputValue<TInput>> {
       pushAction(actionNodes.setVariable(name, input));
-      return createRuntimeVariable<ValueInputValue<TInput>>(name);
+      return createShortcutVariableRef<ValueInputValue<TInput>>(name);
     },
-    dictionary<TValue extends ShortcutDictionary>(value: TValue): RuntimeValue<TValue> {
+    dictionary<TValue extends ShortcutDictionary>(value: TValue): ShortcutValueRef<TValue> {
       return pushOutputAction<TValue>("dictionary", {
         value,
       });
     },
-    url(value: ValueInput): RuntimeValue<string> {
+    url(value: ValueInput): ShortcutValueRef<string> {
       return pushOutputAction("url", {
         value,
       });
@@ -338,7 +338,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     getDictionaryValue<TInput extends ValueInput, TKey extends ValueInput>(
       input: TInput,
       key: TKey,
-    ): RuntimeValue<DictionaryValueFor<TInput, TKey>> {
+    ): ShortcutValueRef<DictionaryValueFor<TInput, TKey>> {
       return pushOutputAction<DictionaryValueFor<TInput, TKey>>("getDictionaryValue", {
         input,
         key,
@@ -347,19 +347,19 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     getContentsOfURL(
       input: ValueInput,
       options: GetContentsOfURLOptions = {},
-    ): RuntimeValue<unknown> {
+    ): ShortcutValueRef<unknown> {
       return pushOutputAction("getContentsOfURL", {
         input,
         options,
       });
     },
-    base64Encode(input: ValueInput): RuntimeValue<string> {
+    base64Encode(input: ValueInput): ShortcutValueRef<string> {
       return pushOutputAction("base64", {
         input,
         mode: "Encode",
       });
     },
-    base64Decode(input: ValueInput): RuntimeValue<string> {
+    base64Decode(input: ValueInput): ShortcutValueRef<string> {
       return pushOutputAction("base64", {
         input,
         mode: "Decode",
@@ -368,7 +368,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     askForInput(
       promptOrOptions?: ValueInput | AskForInputOptions,
       options: AskForInputOptions = {},
-    ): RuntimeValue<string> {
+    ): ShortcutValueRef<string> {
       const normalized = normalizeAskForInputArguments(promptOrOptions, options);
 
       return pushOutputAction("askForInput", {
@@ -379,24 +379,24 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     chooseFromList<TInput extends ValueInput>(
       input: TInput,
       options: ChooseFromListOptions = {},
-    ): RuntimeValue<ValueInputListItem<TInput>> {
+    ): ShortcutValueRef<ValueInputListItem<TInput>> {
       return pushOutputAction<ValueInputListItem<TInput>>("chooseFromList", {
         input,
         options,
       });
     },
-    detectDictionary(input: ValueInput): RuntimeValue<ShortcutDictionary> {
+    detectDictionary(input: ValueInput): ShortcutValueRef<ShortcutDictionary> {
       return pushOutputAction("detectDictionary", {
         input,
       });
     },
-    matchText(input: ValueInput, pattern: ValueInput): RuntimeValue<string[]> {
+    matchText(input: ValueInput, pattern: ValueInput): ShortcutValueRef<string[]> {
       return pushOutputAction("matchText", {
         input,
         pattern,
       });
     },
-    splitText(input: ValueInput, options: SplitTextOptions = {}): RuntimeValue<string[]> {
+    splitText(input: ValueInput, options: SplitTextOptions = {}): ShortcutValueRef<string[]> {
       return pushOutputAction("splitText", {
         input,
         options,
@@ -406,7 +406,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
       input: ValueInput,
       find: ValueInput,
       replace: ValueInput,
-    ): RuntimeValue<string> {
+    ): ShortcutValueRef<string> {
       return pushOutputAction("replaceText", {
         input,
         find,
@@ -416,7 +416,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     getItemFromList<TInput extends ValueInput>(
       input: TInput,
       options: GetItemFromListOptions = {},
-    ): RuntimeValue<ValueInputListItem<TInput>> {
+    ): ShortcutValueRef<ValueInputListItem<TInput>> {
       return pushOutputAction<ValueInputListItem<TInput>>("getItemFromList", {
         input,
         options,
@@ -428,9 +428,9 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     openApp(app: OpenAppInput): void {
       pushAction(actionNodes.openApp(app));
     },
-    appendVariable(name: string, input: ValueInput): RuntimeVariable<unknown> {
+    appendVariable(name: string, input: ValueInput): ShortcutVariableRef<unknown> {
       pushAction(actionNodes.appendVariable(name, input));
-      return createRuntimeVariable(name);
+      return createShortcutVariableRef(name);
     },
     exists(left: unknown): ShortcutSingleCondition {
       return createExistsCondition(left);
@@ -465,7 +465,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     if(condition: ShortcutCondition, branches: {
       then: WorkflowBranch;
       otherwise?: WorkflowBranch;
-    }): RuntimeValue<unknown> {
+    }): ShortcutValueRef<unknown> {
       const { node, output } = outputIfAction(
         condition,
         {
@@ -476,7 +476,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
       );
 
       nodes.push(node);
-      return createRuntimeValue(output);
+      return createShortcutValueRef(output);
     },
     when(condition: ShortcutCondition, then: WorkflowBranch): void {
       nodes.push({

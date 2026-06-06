@@ -12,7 +12,7 @@ import {
   paramsFor,
 } from "./helpers.js";
 
-test("RuntimeValue 可以作为上游 action 输出引用", () => {
+test("ShortcutValueRef 可以作为上游 action 输出引用", () => {
   const actions = compileActions(defineShortcut({
     name: "Runtime Value Output",
     workflow: (shortcut) => {
@@ -25,7 +25,7 @@ test("RuntimeValue 可以作为上游 action 输出引用", () => {
   assertTextTokenActionOutput(result.Text, "文本");
 });
 
-test("RuntimeValue 链式文本操作会编译为 Replace Text、Split Text 和 Get Item from List", () => {
+test("ShortcutValueRef 链式文本操作会编译为 Replace Text、Split Text 和 Get Item from List", () => {
   const actions = compileActions(defineShortcut({
     name: "Runtime Value Text Chain",
     workflow: (shortcut) => {
@@ -56,7 +56,7 @@ test("RuntimeValue 链式文本操作会编译为 Replace Text、Split Text 和 
   assertTextTokenActionOutput(result.Text, "来自列表的项目");
 });
 
-test("RuntimeValue 词典取值、Base64 解码和 when 会编译为对应运行期 action", () => {
+test("ShortcutValueRef 词典取值、Base64 解码和 when 会编译为对应运行期 action", () => {
   const actions = compileActions(defineShortcut({
     name: "Runtime Value Dictionary Chain",
     workflow: (shortcut) => {
@@ -88,7 +88,7 @@ test("RuntimeValue 词典取值、Base64 解码和 when 会编译为对应运行
   assertActionOutputAttachment(conditionInput.Variable, "Base64已编码内容");
 });
 
-test("RuntimeValue equals 可以直接作为 if 条件", () => {
+test("ShortcutValueRef equals 可以直接作为 if 条件", () => {
   const actions = compileActions(defineShortcut({
     name: "Runtime Value Equals",
     workflow: (shortcut) => {
@@ -109,7 +109,7 @@ test("RuntimeValue equals 可以直接作为 if 条件", () => {
   assert.equal(start.WFConditionalActionString, "Hello");
 });
 
-test("RuntimeValue 文本条件可以直接组成多条件 if", () => {
+test("ShortcutValueRef 文本条件可以直接组成多条件 if", () => {
   const actions = compileActions(defineShortcut({
     name: "Runtime Value Condition Group",
     workflow: (shortcut) => {

@@ -38,7 +38,7 @@ https://www.icloud.com/shortcuts/ff773c18b6f2464cbb1a7a46e0c0e491
 | `shortcut.beginsWith(left, right)`       | 开头是         | `8`           |
 | `shortcut.endsWith(left, right)`         | 结尾是         | `9`           |
 
-`RuntimeValue` 也支持相同条件方法，例如 `message.contains("foo")`。
+`ShortcutValueRef` 也支持相同条件方法，例如 `message.contains("foo")`。
 
 ## 多条件映射
 

@@ -8,9 +8,9 @@ import type { ShortcutIconInput } from "../core/icon.js";
 
 declare const shortcutReferenceBrand: unique symbol;
 
-declare const runtimeValueBrand: unique symbol;
+declare const shortcutValueRefBrand: unique symbol;
 
-export type ValueInput = string | number | boolean | ShortcutReference | RuntimeValue;
+export type ValueInput = string | number | boolean | ShortcutReference | ShortcutValueRef;
 
 export type ShortcutReference<T = unknown> = {
   readonly [shortcutReferenceBrand]: T;
@@ -130,29 +130,35 @@ export type GetItemFromListOptions =
       start: ValueInput;
     };
 
-export type RuntimeValue<T = unknown> = {
-  readonly [runtimeValueBrand]: T;
+/**
+ * Shortcuts 运行期值引用。
+ *
+ * 泛型 T 只表示 ShortcutsFlow 在构建期推断出的期望值形状，
+ * 不代表 Shortcuts 运行时存在严格类型保证。
+ */
+export type ShortcutValueRef<T = unknown> = {
+  readonly [shortcutValueRefBrand]: T;
 
   /**
    * 替换文本。
    *
    * 添加 Replace Text 动作并返回替换后的运行期文本引用。
    */
-  replace(find: ValueInput, replace: ValueInput): RuntimeValue<string>;
+  replace(find: ValueInput, replace: ValueInput): ShortcutValueRef<string>;
 
   /**
    * 拆分文本。
    *
    * 添加 Split Text 动作并返回拆分后的运行期列表引用。
    */
-  split(separator?: SplitTextSeparator | SplitTextOptions): RuntimeValue<string[]>;
+  split(separator?: SplitTextSeparator | SplitTextOptions): ShortcutValueRef<string[]>;
 
   /**
    * 匹配文本。
    *
    * 添加 Match Text 动作并返回匹配结果的运行期列表引用。
    */
-  match(pattern: ValueInput): RuntimeValue<string[]>;
+  match(pattern: ValueInput): ShortcutValueRef<string[]>;
 
   /**
    * 获取词典值。
@@ -161,35 +167,35 @@ export type RuntimeValue<T = unknown> = {
    */
   getDictionaryValue<TKey extends ValueInput>(
     key: TKey,
-  ): RuntimeValue<DictionaryValueFor<RuntimeValue<T>, TKey>>;
+  ): ShortcutValueRef<DictionaryValueFor<ShortcutValueRef<T>, TKey>>;
 
   /**
    * 获取词典值。
    *
    * 添加 Get Dictionary Value 动作的简写方法，适合链式读取词典字段。
    */
-  get<TKey extends ValueInput>(key: TKey): RuntimeValue<DictionaryValueFor<RuntimeValue<T>, TKey>>;
+  get<TKey extends ValueInput>(key: TKey): ShortcutValueRef<DictionaryValueFor<ShortcutValueRef<T>, TKey>>;
 
   /**
    * 从列表中获取项目。
    *
    * 添加 Get Item from List 动作并返回列表项目的运行期值引用。
    */
-  getItem(options?: GetItemFromListOptions): RuntimeValue<ListItem<T>>;
+  getItem(options?: GetItemFromListOptions): ShortcutValueRef<ListItem<T>>;
 
   /**
    * Base64 编码。
    *
    * 添加 Base64 Encode 动作并返回编码后的运行期文本引用。
    */
-  base64Encode(): RuntimeValue<string>;
+  base64Encode(): ShortcutValueRef<string>;
 
   /**
    * Base64 解码。
    *
    * 添加 Base64 Decode 动作并返回解码后的运行期文本引用。
    */
-  base64Decode(): RuntimeValue<string>;
+  base64Decode(): ShortcutValueRef<string>;
 
   /**
    * 如果条件：存在。
@@ -248,7 +254,7 @@ export type RuntimeValue<T = unknown> = {
   endsWith(right: unknown): ShortcutSingleCondition;
 };
 
-export type RuntimeVariable<T = unknown> = RuntimeValue<T> & {
+export type ShortcutVariableRef<T = unknown> = ShortcutValueRef<T> & {
   /**
    * 设置变量。
    *
@@ -256,14 +262,14 @@ export type RuntimeVariable<T = unknown> = RuntimeValue<T> & {
    */
   set<TInput extends ValueInput | undefined = undefined>(
     input?: TInput,
-  ): RuntimeVariable<ValueInputValue<TInput>>;
+  ): ShortcutVariableRef<ValueInputValue<TInput>>;
 
   /**
    * 追加到变量。
    *
    * 添加 Append to Variable 动作并把输入追加到当前运行期命名变量。
    */
-  append(input: ValueInput): RuntimeVariable<unknown>;
+  append(input: ValueInput): ShortcutVariableRef<unknown>;
 };
 
 type WidenLiteral<T> = T extends string
@@ -274,7 +280,7 @@ type WidenLiteral<T> = T extends string
       ? boolean
       : T;
 
-type ValueInputKey<TInput> = TInput extends RuntimeValue<infer Value>
+type ValueInputKey<TInput> = TInput extends ShortcutValueRef<infer Value>
   ? Value
   : TInput extends ShortcutReference
     ? unknown
@@ -294,7 +300,7 @@ type ListItem<T> = T extends readonly (infer Item)[] ? Item : unknown;
  * 提取 ValueInput 对应的运行期值类型。
  */
 export type ValueInputValue<TInput> = WidenLiteral<
-  TInput extends RuntimeValue<infer Value>
+  TInput extends ShortcutValueRef<infer Value>
     ? Value
     : TInput extends ShortcutReference
       ? unknown
@@ -316,20 +322,20 @@ export type DictionaryValueFor<TDictionaryInput, TKeyInput> = DictionaryValue<
   ValueInputKey<TKeyInput>
 >;
 
-type RuntimeValueInternalKey = "kind" | "value" | "valueType";
+type ShortcutValueRefInternalKey = "kind" | "value" | "valueType";
 
-type AssertNoRuntimeValueInternalKeys<T extends never> = T;
+type AssertNoShortcutValueRefInternalKeys<T extends never> = T;
 
-type RuntimeValueInternalKeyCheck = AssertNoRuntimeValueInternalKeys<
-  Extract<keyof RuntimeValue, RuntimeValueInternalKey>
+type ShortcutValueRefInternalKeyCheck = AssertNoShortcutValueRefInternalKeys<
+  Extract<keyof ShortcutValueRef, ShortcutValueRefInternalKey>
 >;
 
-type ShortcutReferenceInternalKeyCheck = AssertNoRuntimeValueInternalKeys<
-  Extract<keyof ShortcutReference, RuntimeValueInternalKey>
+type ShortcutReferenceInternalKeyCheck = AssertNoShortcutValueRefInternalKeys<
+  Extract<keyof ShortcutReference, ShortcutValueRefInternalKey>
 >;
 
-type RuntimeVariableInternalKeyCheck = AssertNoRuntimeValueInternalKeys<
-  Extract<keyof RuntimeVariable, RuntimeValueInternalKey>
+type ShortcutVariableRefInternalKeyCheck = AssertNoShortcutValueRefInternalKeys<
+  Extract<keyof ShortcutVariableRef, ShortcutValueRefInternalKey>
 >;
 
 export type OpenAppInput = string | {
@@ -376,7 +382,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  text(value: ValueInput): RuntimeValue<string>;
+  text(value: ValueInput): ShortcutValueRef<string>;
 
   /**
    * 显示结果。
@@ -426,7 +432,7 @@ export type WorkflowBuilder = {
   setVariable<TInput extends ValueInput | undefined = undefined>(
     name: string,
     input?: TInput,
-  ): RuntimeVariable<ValueInputValue<TInput>>;
+  ): ShortcutVariableRef<ValueInputValue<TInput>>;
 
   /**
    * 变量。
@@ -445,7 +451,7 @@ export type WorkflowBuilder = {
   variable<TInput extends ValueInput | undefined = undefined>(
     name: string,
     input?: TInput,
-  ): RuntimeVariable<ValueInputValue<TInput>>;
+  ): ShortcutVariableRef<ValueInputValue<TInput>>;
 
   /**
    * 词典。
@@ -464,7 +470,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  dictionary<TValue extends ShortcutDictionary>(value: TValue): RuntimeValue<TValue>;
+  dictionary<TValue extends ShortcutDictionary>(value: TValue): ShortcutValueRef<TValue>;
 
   /**
    * URL。
@@ -479,7 +485,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  url(value: ValueInput): RuntimeValue<string>;
+  url(value: ValueInput): ShortcutValueRef<string>;
 
   /**
    * 打开 URL。
@@ -530,7 +536,7 @@ export type WorkflowBuilder = {
   getDictionaryValue<TInput extends ValueInput, TKey extends ValueInput>(
     input: TInput,
     key: TKey,
-  ): RuntimeValue<DictionaryValueFor<TInput, TKey>>;
+  ): ShortcutValueRef<DictionaryValueFor<TInput, TKey>>;
 
   /**
    * 获取 URL 内容。
@@ -551,7 +557,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  getContentsOfURL(input: ValueInput, options?: GetContentsOfURLOptions): RuntimeValue<unknown>;
+  getContentsOfURL(input: ValueInput, options?: GetContentsOfURLOptions): ShortcutValueRef<unknown>;
 
   /**
    * Base64 编码。
@@ -567,7 +573,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  base64Encode(input: ValueInput): RuntimeValue<string>;
+  base64Encode(input: ValueInput): ShortcutValueRef<string>;
 
   /**
    * Base64 解码。
@@ -583,7 +589,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  base64Decode(input: ValueInput): RuntimeValue<string>;
+  base64Decode(input: ValueInput): ShortcutValueRef<string>;
 
   /**
    * 询问输入。
@@ -601,8 +607,8 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  askForInput(prompt: ValueInput, options?: AskForInputOptions): RuntimeValue<string>;
-  askForInput(options?: AskForInputOptions): RuntimeValue<string>;
+  askForInput(prompt: ValueInput, options?: AskForInputOptions): ShortcutValueRef<string>;
+  askForInput(options?: AskForInputOptions): ShortcutValueRef<string>;
 
   /**
    * 从列表中选取。
@@ -622,7 +628,7 @@ export type WorkflowBuilder = {
   chooseFromList<TInput extends ValueInput>(
     input: TInput,
     options?: ChooseFromListOptions,
-  ): RuntimeValue<ValueInputListItem<TInput>>;
+  ): ShortcutValueRef<ValueInputListItem<TInput>>;
 
   /**
    * 从输入中获取词典。
@@ -638,7 +644,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  detectDictionary(input: ValueInput): RuntimeValue<ShortcutDictionary>;
+  detectDictionary(input: ValueInput): ShortcutValueRef<ShortcutDictionary>;
 
   /**
    * 匹配文本。
@@ -653,7 +659,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  matchText(input: ValueInput, pattern: ValueInput): RuntimeValue<string[]>;
+  matchText(input: ValueInput, pattern: ValueInput): ShortcutValueRef<string[]>;
 
   /**
    * 拆分文本。
@@ -670,7 +676,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  splitText(input: ValueInput, options?: SplitTextOptions): RuntimeValue<string[]>;
+  splitText(input: ValueInput, options?: SplitTextOptions): ShortcutValueRef<string[]>;
 
   /**
    * 替换文本。
@@ -685,7 +691,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  replaceText(input: ValueInput, find: ValueInput, replace: ValueInput): RuntimeValue<string>;
+  replaceText(input: ValueInput, find: ValueInput, replace: ValueInput): ShortcutValueRef<string>;
 
   /**
    * 从列表中获取项目。
@@ -705,7 +711,7 @@ export type WorkflowBuilder = {
   getItemFromList<TInput extends ValueInput>(
     input: TInput,
     options?: GetItemFromListOptions,
-  ): RuntimeValue<ValueInputListItem<TInput>>;
+  ): ShortcutValueRef<ValueInputListItem<TInput>>;
 
   /**
    * 等待。
@@ -753,7 +759,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  appendVariable(name: string, input: ValueInput): RuntimeVariable<unknown>;
+  appendVariable(name: string, input: ValueInput): ShortcutVariableRef<unknown>;
 
   /**
    * 如果条件：存在。
@@ -975,7 +981,7 @@ export type WorkflowBuilder = {
   if(condition: ShortcutCondition, branches: {
     then: WorkflowBranch;
     otherwise?: WorkflowBranch;
-  }): RuntimeValue<unknown>;
+  }): ShortcutValueRef<unknown>;
 
   /**
    * 如果。

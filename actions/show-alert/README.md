@@ -85,4 +85,4 @@
 - `message` 编译到 `WFAlertActionMessage`。
 - `options.showCancelButton` 只在显式传入时编译到 `WFAlertActionCancelButtonShown`。
 - 字面量输入直接写入对应参数。
-- `RuntimeValue` 输入编译为 `WFTextTokenString`。
+- `ShortcutValueRef` 输入编译为 `WFTextTokenString`。

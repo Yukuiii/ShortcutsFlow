@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert";
 import test from "node:test";
 import {
   defineShortcut,
-  type RuntimeValue,
+  type ShortcutValueRef,
   type ShortcutSingleCondition,
   type WorkflowBuilder,
 } from "shortcutsflow";
@@ -18,7 +18,7 @@ import {
 
 type IfConditionCase = {
   name: string;
-  build: (shortcut: WorkflowBuilder, message: RuntimeValue<string>) => ShortcutSingleCondition;
+  build: (shortcut: WorkflowBuilder, message: ShortcutValueRef<string>) => ShortcutSingleCondition;
   conditionCode: number;
   right?: string;
 };

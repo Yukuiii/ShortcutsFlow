@@ -52,6 +52,6 @@
 ## 编译规则
 
 - 字面量输入直接写入 `Text`。
-- `RuntimeValue` 输入编译为 `WFTextTokenString`。
+- `ShortcutValueRef` 输入编译为 `WFTextTokenString`。
 - `"{0, 1}"` 表示 `string` 中从第 0 个字符开始、长度为 1 的占位符绑定到附件。
 - `OutputUUID` 必须指向上游带 `UUID` 的 action。

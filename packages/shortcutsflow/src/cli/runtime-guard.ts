@@ -7,7 +7,7 @@ type RuntimeGuardIssue = {
   message: string;
 };
 
-const runtimeValueMethods = new Set([
+const shortcutValueRefMethods = new Set([
   "appendVariable",
   "askForInput",
   "base64Decode",
@@ -103,16 +103,16 @@ function collectRuntimeGuardIssues(sourceFile: ts.SourceFile): RuntimeGuardIssue
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
       checkIfResultSelfReference(node.name, node.initializer, addIssue);
 
-      if (isRuntimeValueExpression(node.initializer, isRuntimeIdentifier)) {
+      if (isShortcutValueRefExpression(node.initializer, isRuntimeIdentifier)) {
         currentScope().add(node.name.text);
       }
     }
 
-    if (ts.isIfStatement(node) && isRuntimeValueExpression(node.expression, isRuntimeIdentifier)) {
+    if (ts.isIfStatement(node) && isShortcutValueRefExpression(node.expression, isRuntimeIdentifier)) {
       addIssue(node.expression, "Use shortcut.if(value.exists(), ...) or shortcut.when(value.exists(), ...) instead of native if.");
     }
 
-    if (ts.isConditionalExpression(node) && isRuntimeValueExpression(node.condition, isRuntimeIdentifier)) {
+    if (ts.isConditionalExpression(node) && isShortcutValueRefExpression(node.condition, isRuntimeIdentifier)) {
       addIssue(node.condition, "Use shortcut.if/shortcut.when instead of native ternary expressions for runtime values.");
     }
 
@@ -374,8 +374,8 @@ function checkBinaryExpression(
   isRuntimeIdentifier: (node: ts.Node) => boolean,
   addIssue: (node: ts.Node, message: string) => void,
 ): void {
-  const leftIsRuntime = isRuntimeValueExpression(node.left, isRuntimeIdentifier);
-  const rightIsRuntime = isRuntimeValueExpression(node.right, isRuntimeIdentifier);
+  const leftIsRuntime = isShortcutValueRefExpression(node.left, isRuntimeIdentifier);
+  const rightIsRuntime = isShortcutValueRefExpression(node.right, isRuntimeIdentifier);
 
   if (!leftIsRuntime && !rightIsRuntime) {
     return;
@@ -405,7 +405,7 @@ function checkBinaryExpression(
 /**
  * 判断表达式是否会产生或引用运行期值。
  */
-function isRuntimeValueExpression(
+function isShortcutValueRefExpression(
   node: ts.Expression,
   isRuntimeIdentifier: (node: ts.Node) => boolean,
 ): boolean {
@@ -434,7 +434,7 @@ function isRuntimeValueExpression(
   }
 
   if (
-    isRuntimeValueExpression(callee.expression, isRuntimeIdentifier) &&
+    isShortcutValueRefExpression(callee.expression, isRuntimeIdentifier) &&
     (chainRuntimeMethods.has(callee.name.text) || conditionMethods.has(callee.name.text))
   ) {
     return true;
@@ -449,7 +449,7 @@ function isRuntimeValueExpression(
 function isShortcutRuntimeCall(callee: ts.PropertyAccessExpression): boolean {
   return ts.isIdentifier(callee.expression) &&
     callee.expression.text === "shortcut" &&
-    runtimeValueMethods.has(callee.name.text);
+    shortcutValueRefMethods.has(callee.name.text);
 }
 
 /**
