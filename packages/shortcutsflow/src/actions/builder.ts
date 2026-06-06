@@ -146,7 +146,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     return createRuntimeValue(output);
   };
   const createRuntimeValue = <T>(value: ShortcutValue<T>): RuntimeValue<T> => {
-    const runtimeValue = value as RuntimeValue<T>;
+    const runtimeValue = value as unknown as RuntimeValue<T>;
 
     if (typeof runtimeValue.exists === "function") {
       return runtimeValue;

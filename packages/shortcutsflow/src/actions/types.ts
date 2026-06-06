@@ -3,11 +3,18 @@ import type {
   ShortcutDictionary,
   ShortcutNode,
   ShortcutSingleCondition,
-  ShortcutValue,
 } from "../core/types.js";
 import type { ShortcutIconInput } from "../core/icon.js";
 
-export type ValueInput = string | number | boolean | ShortcutValue;
+declare const shortcutReferenceBrand: unique symbol;
+
+declare const runtimeValueBrand: unique symbol;
+
+export type ValueInput = string | number | boolean | ShortcutReference | RuntimeValue;
+
+export type ShortcutReference<T = unknown> = {
+  readonly [shortcutReferenceBrand]: T;
+};
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -123,7 +130,9 @@ export type GetItemFromListOptions =
       start: ValueInput;
     };
 
-export type RuntimeValue<T = unknown> = ShortcutValue<T> & {
+export type RuntimeValue<T = unknown> = {
+  readonly [runtimeValueBrand]: T;
+
   /**
    * 替换文本。
    *
@@ -164,7 +173,9 @@ export type RuntimeValue<T = unknown> = ShortcutValue<T> & {
    *
    * 添加 Get Item from List 动作并返回列表项目的运行期值引用。
    */
-  getItem(options?: GetItemFromListOptions): RuntimeValue<unknown>;
+  getItem(
+    options?: GetItemFromListOptions,
+  ): RuntimeValue<T extends readonly (infer Item)[] ? Item : unknown>;
 
   /**
    * Base64 编码。
@@ -236,6 +247,18 @@ export type RuntimeValue<T = unknown> = ShortcutValue<T> & {
    */
   endsWith(right: unknown): ShortcutSingleCondition;
 };
+
+type RuntimeValueInternalKey = "kind" | "value" | "valueType";
+
+type AssertNoRuntimeValueInternalKeys<T extends never> = T;
+
+type RuntimeValueInternalKeyCheck = AssertNoRuntimeValueInternalKeys<
+  Extract<keyof RuntimeValue, RuntimeValueInternalKey>
+>;
+
+type ShortcutReferenceInternalKeyCheck = AssertNoRuntimeValueInternalKeys<
+  Extract<keyof ShortcutReference, RuntimeValueInternalKey>
+>;
 
 export type OpenAppInput = string | {
   bundleIdentifier: string;
