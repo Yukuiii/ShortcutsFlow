@@ -98,3 +98,91 @@ test("runtime guard 拦截运行期值的原生相等和加法", () => {
     removeShortcutSource(file);
   }
 });
+
+test("runtime guard 拦截 if 结果在自身分支中引用", () => {
+  const file = writeShortcutSource(`
+    import { defineShortcut } from "shortcutsflow";
+
+    export default defineShortcut({
+      name: "Self Referenced If Result",
+      workflow: (shortcut) => {
+        const message = shortcut.text("Hello");
+        const result = shortcut.if(shortcut.equals(message, "Hello"), {
+          then: (shortcut) => {
+            shortcut.showResult(result);
+          },
+        });
+        shortcut.showResult(result);
+      },
+    });
+  `);
+
+  try {
+    assert.throws(
+      () => assertNoRuntimeSyntaxMisuse(file),
+      /Do not reference an If result inside the same shortcut\.if\(\.\.\.\) branches/,
+    );
+  } finally {
+    removeShortcutSource(file);
+  }
+});
+
+test("runtime guard 拦截赋值形式的 if 结果在自身分支中引用", () => {
+  const file = writeShortcutSource(`
+    import { defineShortcut } from "shortcutsflow";
+
+    export default defineShortcut({
+      name: "Assigned If Result",
+      workflow: (shortcut) => {
+        const message = shortcut.text("Hello");
+        let result;
+        result = shortcut.if(shortcut.equals(message, "Hello"), {
+          otherwise: (shortcut) => {
+            shortcut.showResult(result);
+          },
+        });
+      },
+    });
+  `);
+
+  try {
+    assert.throws(
+      () => assertNoRuntimeSyntaxMisuse(file),
+      /Do not reference an If result inside the same shortcut\.if\(\.\.\.\) branches/,
+    );
+  } finally {
+    removeShortcutSource(file);
+  }
+});
+
+test("runtime guard 允许之前的 if 结果在后续分支中引用", () => {
+  const file = writeShortcutSource(`
+    import { defineShortcut } from "shortcutsflow";
+
+    export default defineShortcut({
+      name: "Previous If Result",
+      workflow: (shortcut) => {
+        const message = shortcut.text("Hello");
+        const previous = shortcut.if(shortcut.equals(message, "Hello"), {
+          then: (shortcut) => {
+            shortcut.showResult(message);
+          },
+        });
+
+        const next = shortcut.if(shortcut.exists(previous), {
+          then: (shortcut) => {
+            shortcut.showResult(previous);
+          },
+        });
+
+        shortcut.showResult(next);
+      },
+    });
+  `);
+
+  try {
+    assert.doesNotThrow(() => assertNoRuntimeSyntaxMisuse(file));
+  } finally {
+    removeShortcutSource(file);
+  }
+});

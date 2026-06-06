@@ -18,6 +18,7 @@ const runtimeValueMethods = new Set([
   "getContentsOfURL",
   "getDictionaryValue",
   "getItemFromList",
+  "if",
   "matchText",
   "replaceText",
   "setVariable",
@@ -38,9 +39,17 @@ const chainRuntimeMethods = new Set([
 ]);
 
 const conditionMethods = new Set([
+  "beginsWith",
+  "contains",
+  "doesNotContain",
+  "doesNotExist",
+  "endsWith",
   "equals",
   "exists",
+  "notEquals",
 ]);
+
+const ifResultSelfReferenceMessage = "Do not reference an If result inside the same shortcut.if(...) branches. The If result is only available after that If control flow ends.";
 
 /**
  * 在导入用户模块前检查常见运行期值原生语法误用。
@@ -89,6 +98,8 @@ function collectRuntimeGuardIssues(sourceFile: ts.SourceFile): RuntimeGuardIssue
     }
 
     if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.initializer) {
+      checkIfResultSelfReference(node.name, node.initializer, addIssue);
+
       if (isRuntimeValueExpression(node.initializer, isRuntimeIdentifier)) {
         currentScope().add(node.name.text);
       }
@@ -103,6 +114,7 @@ function collectRuntimeGuardIssues(sourceFile: ts.SourceFile): RuntimeGuardIssue
     }
 
     if (ts.isBinaryExpression(node)) {
+      checkIfResultAssignmentSelfReference(node, addIssue);
       checkBinaryExpression(node, isRuntimeIdentifier, addIssue);
     }
 
@@ -126,6 +138,229 @@ function isFunctionLikeWithBody(node: ts.Node): boolean {
     ts.isGetAccessorDeclaration(node) ||
     ts.isSetAccessorDeclaration(node)
   ) && node.body !== undefined;
+}
+
+/**
+ * 检查 If 返回值是否在自身分支中被引用。
+ */
+function checkIfResultSelfReference(
+  resultName: ts.Identifier,
+  initializer: ts.Expression,
+  addIssue: (node: ts.Node, message: string) => void,
+): void {
+  for (const branchBody of findShortcutIfBranchBodies(initializer)) {
+    const reference = findIdentifierReference(branchBody, resultName.text);
+
+    if (reference) {
+      addIssue(reference, ifResultSelfReferenceMessage);
+    }
+  }
+}
+
+/**
+ * 检查赋值形式的 If 返回值是否在自身分支中被引用。
+ */
+function checkIfResultAssignmentSelfReference(
+  node: ts.BinaryExpression,
+  addIssue: (node: ts.Node, message: string) => void,
+): void {
+  if (node.operatorToken.kind !== ts.SyntaxKind.EqualsToken || !ts.isIdentifier(node.left)) {
+    return;
+  }
+
+  checkIfResultSelfReference(node.left, node.right, addIssue);
+}
+
+/**
+ * 读取 shortcut.if 调用中的 then 和 otherwise 分支函数体。
+ */
+function findShortcutIfBranchBodies(initializer: ts.Expression): ts.Node[] {
+  const expression = unwrapExpression(initializer);
+
+  if (!ts.isCallExpression(expression) || !isShortcutIfCall(expression)) {
+    return [];
+  }
+
+  const branches = expression.arguments[1];
+
+  if (!branches || !ts.isObjectLiteralExpression(branches)) {
+    return [];
+  }
+
+  return branches.properties.flatMap((property) => {
+    if (ts.isPropertyAssignment(property) && isIfBranchPropertyName(property.name)) {
+      return getFunctionBody(property.initializer);
+    }
+
+    if (ts.isMethodDeclaration(property) && isIfBranchPropertyName(property.name)) {
+      return property.body ? [property.body] : [];
+    }
+
+    return [];
+  });
+}
+
+/**
+ * 判断调用表达式是否是 shortcut.if(...)。
+ */
+function isShortcutIfCall(node: ts.CallExpression): boolean {
+  const callee = node.expression;
+
+  return ts.isPropertyAccessExpression(callee) &&
+    ts.isIdentifier(callee.expression) &&
+    callee.expression.text === "shortcut" &&
+    callee.name.text === "if";
+}
+
+/**
+ * 判断对象属性名是否是 If 分支字段。
+ */
+function isIfBranchPropertyName(name: ts.PropertyName): boolean {
+  return (
+    (ts.isIdentifier(name) || ts.isStringLiteral(name)) &&
+    (name.text === "then" || name.text === "otherwise")
+  );
+}
+
+/**
+ * 读取函数表达式的函数体节点。
+ */
+function getFunctionBody(node: ts.Expression): ts.Node[] {
+  if ((ts.isArrowFunction(node) || ts.isFunctionExpression(node)) && node.body) {
+    return [node.body];
+  }
+
+  return [];
+}
+
+/**
+ * 查找指定标识符的真实引用位置。
+ */
+function findIdentifierReference(root: ts.Node, name: string): ts.Identifier | undefined {
+  let reference: ts.Identifier | undefined;
+
+  const visit = (node: ts.Node): void => {
+    if (reference) {
+      return;
+    }
+
+    if (isFunctionLikeWithBody(node) && functionLikeShadowsName(node, name)) {
+      return;
+    }
+
+    if (ts.isBlock(node) && blockDeclaresName(node, name)) {
+      return;
+    }
+
+    if (bindingDeclarationDeclaresName(node, name)) {
+      return;
+    }
+
+    if (ts.isIdentifier(node) && node.text === name && isIdentifierReference(node)) {
+      reference = node;
+      return;
+    }
+
+    ts.forEachChild(node, visit);
+  };
+
+  visit(root);
+  return reference;
+}
+
+/**
+ * 判断函数节点是否声明了同名局部绑定。
+ */
+function functionLikeShadowsName(node: ts.Node, name: string): boolean {
+  if (
+    !ts.isFunctionDeclaration(node) &&
+    !ts.isFunctionExpression(node) &&
+    !ts.isArrowFunction(node) &&
+    !ts.isMethodDeclaration(node) &&
+    !ts.isConstructorDeclaration(node) &&
+    !ts.isGetAccessorDeclaration(node) &&
+    !ts.isSetAccessorDeclaration(node)
+  ) {
+    return false;
+  }
+
+  if (
+    (ts.isFunctionDeclaration(node) || ts.isFunctionExpression(node)) &&
+    node.name?.text === name
+  ) {
+    return true;
+  }
+
+  return node.parameters.some((parameter: ts.ParameterDeclaration) =>
+    bindingNameMatches(parameter.name, name)
+  );
+}
+
+/**
+ * 判断代码块的直接语句是否声明了同名局部绑定。
+ */
+function blockDeclaresName(block: ts.Block, name: string): boolean {
+  return block.statements.some((statement) => {
+    if (ts.isVariableStatement(statement)) {
+      return statement.declarationList.declarations.some((declaration) =>
+        bindingNameMatches(declaration.name, name)
+      );
+    }
+
+    if (ts.isFunctionDeclaration(statement) || ts.isClassDeclaration(statement)) {
+      return statement.name?.text === name;
+    }
+
+    return false;
+  });
+}
+
+/**
+ * 判断声明节点是否声明了指定绑定名。
+ */
+function bindingDeclarationDeclaresName(node: ts.Node, name: string): boolean {
+  return (
+    (ts.isVariableDeclaration(node) || ts.isParameter(node) || ts.isBindingElement(node)) &&
+    bindingNameMatches(node.name, name)
+  );
+}
+
+/**
+ * 判断绑定名或解构绑定中是否包含指定名称。
+ */
+function bindingNameMatches(bindingName: ts.BindingName, name: string): boolean {
+  if (ts.isIdentifier(bindingName)) {
+    return bindingName.text === name;
+  }
+
+  return bindingName.elements.some((element) =>
+    !ts.isOmittedExpression(element) && bindingNameMatches(element.name, name)
+  );
+}
+
+/**
+ * 判断标识符是否是表达式中的读取引用。
+ */
+function isIdentifierReference(node: ts.Identifier): boolean {
+  const parent = node.parent;
+
+  if (
+    (ts.isPropertyAccessExpression(parent) && parent.name === node) ||
+    (ts.isPropertyAssignment(parent) && parent.name === node) ||
+    (ts.isMethodDeclaration(parent) && parent.name === node) ||
+    (ts.isPropertyDeclaration(parent) && parent.name === node) ||
+    (ts.isVariableDeclaration(parent) && parent.name === node) ||
+    (ts.isParameter(parent) && parent.name === node) ||
+    (ts.isBindingElement(parent) && parent.name === node) ||
+    (ts.isFunctionDeclaration(parent) && parent.name === node) ||
+    (ts.isFunctionExpression(parent) && parent.name === node) ||
+    (ts.isClassDeclaration(parent) && parent.name === node) ||
+    (ts.isImportSpecifier(parent) && parent.name === node)
+  ) {
+    return false;
+  }
+
+  return true;
 }
 
 /**
