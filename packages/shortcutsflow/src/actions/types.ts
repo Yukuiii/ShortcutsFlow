@@ -11,27 +11,67 @@ export type ValueInput = string | number | boolean | ShortcutValue;
 export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
 export type GetContentsOfURLOptions = {
+  /**
+   * 设置 HTTP 请求方法。
+   */
   method?: HTTPMethod;
+
+  /**
+   * 设置 HTTP 请求头词典。
+   */
   headers?: ShortcutDictionary;
 };
 
 export type AskForInputInputType = "Text" | "Number" | "URL" | "Date" | "Date and Time" | "Time";
 
 export type AskForInputTextOptions = {
+  /**
+   * 使用文本输入类型；省略时默认按文本输入编译。
+   */
   inputType?: "Text";
+
+  /**
+   * 设置请求输入的默认回答。
+   */
   defaultAnswer?: ValueInput;
+
+  /**
+   * 控制文本输入是否允许多行。
+   */
   allowMultipleLines?: boolean;
 };
 
 export type AskForInputNumberOptions = {
+  /**
+   * 使用数字输入类型。
+   */
   inputType: "Number";
+
+  /**
+   * 设置请求输入的默认回答。
+   */
   defaultAnswer?: ValueInput;
+
+  /**
+   * 控制数字输入是否允许小数。
+   */
   allowDecimal?: boolean;
+
+  /**
+   * 控制数字输入是否允许负数。
+   */
   allowNegative?: boolean;
 };
 
 export type AskForInputTypedOptions = {
+  /**
+   * 使用 URL、日期、日期时间或时间输入类型。
+   */
   inputType: Exclude<AskForInputInputType, "Text" | "Number">;
+
+  /**
+   * 设置请求输入的默认回答。
+   */
   defaultAnswer?: ValueInput;
 };
 
@@ -41,25 +81,44 @@ export type AskForInputOptions =
   | AskForInputTypedOptions;
 
 export type ChooseFromListOptions = {
+  /**
+   * 设置列表选择提示文本。
+   */
   prompt?: ValueInput;
 };
 
 export type ShowAlertOptions = {
+  /**
+   * 控制显示提醒是否展示取消按钮。
+   */
   showCancelButton?: boolean;
 };
 
 export type SplitTextSeparator = "New Lines" | "Spaces" | "Commas";
 
 export type SplitTextOptions = {
+  /**
+   * 设置拆分文本使用的分隔符。
+   */
   separator?: SplitTextSeparator;
 };
 
 export type GetItemFromListOptions =
   | {
+      /**
+       * 设置从列表取项目的模式。
+       */
       mode?: "first" | "last" | "random";
     }
   | {
+      /**
+       * 使用范围模式从列表取项目。
+       */
       mode: "range";
+
+      /**
+       * 设置范围模式的起始位置。
+       */
       start: ValueInput;
     };
 
