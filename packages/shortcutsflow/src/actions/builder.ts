@@ -29,6 +29,7 @@ import type {
   AskForInputOptions,
   BuilderShortcutDefinition,
   ChooseFromListOptions,
+  DictionaryValueFor,
   GetContentsOfURLOptions,
   GetItemFromListOptions,
   OpenAppInput,
@@ -38,6 +39,8 @@ import type {
   SplitTextSeparator,
   SplitTextOptions,
   ValueInput,
+  ValueInputListItem,
+  ValueInputValue,
   WorkflowBranch,
   WorkflowBuilder,
 } from "./types.js";
@@ -177,22 +180,28 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
           }),
       },
       getDictionaryValue: {
-        value: (key: ValueInput): RuntimeValue<unknown> =>
-          pushOutputAction("getDictionaryValue", {
+        value: <TKey extends ValueInput>(
+          key: TKey,
+        ): RuntimeValue<DictionaryValueFor<RuntimeValue<T>, TKey>> =>
+          pushOutputAction<DictionaryValueFor<RuntimeValue<T>, TKey>>("getDictionaryValue", {
             input: runtimeValue,
             key,
           }),
       },
       get: {
-        value: (key: ValueInput): RuntimeValue<unknown> =>
-          pushOutputAction("getDictionaryValue", {
+        value: <TKey extends ValueInput>(
+          key: TKey,
+        ): RuntimeValue<DictionaryValueFor<RuntimeValue<T>, TKey>> =>
+          pushOutputAction<DictionaryValueFor<RuntimeValue<T>, TKey>>("getDictionaryValue", {
             input: runtimeValue,
             key,
           }),
       },
       getItem: {
-        value: (options: GetItemFromListOptions = {}): RuntimeValue<unknown> =>
-          pushOutputAction("getItemFromList", {
+        value: (
+          options: GetItemFromListOptions = {},
+        ): RuntimeValue<ValueInputListItem<RuntimeValue<T>>> =>
+          pushOutputAction<ValueInputListItem<RuntimeValue<T>>>("getItemFromList", {
             input: runtimeValue,
             options,
           }),
@@ -254,9 +263,11 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
 
     Object.defineProperties(runtimeVariable, {
       set: {
-        value: (input?: ValueInput): RuntimeVariable<unknown> => {
+        value: <TInput extends ValueInput | undefined = undefined>(
+          input?: TInput,
+        ): RuntimeVariable<ValueInputValue<TInput>> => {
           pushAction(actionNodes.setVariable(name, input));
-          return createRuntimeVariable(name);
+          return createRuntimeVariable<ValueInputValue<TInput>>(name);
         },
       },
       append: {
@@ -294,16 +305,22 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     ): void {
       pushAction(actionNodes.showAlert(title, message, options));
     },
-    setVariable(name: string, input?: ValueInput): RuntimeVariable<unknown> {
+    setVariable<TInput extends ValueInput | undefined = undefined>(
+      name: string,
+      input?: TInput,
+    ): RuntimeVariable<ValueInputValue<TInput>> {
       pushAction(actionNodes.setVariable(name, input));
-      return createRuntimeVariable(name);
+      return createRuntimeVariable<ValueInputValue<TInput>>(name);
     },
-    variable(name: string, input?: ValueInput): RuntimeVariable<unknown> {
+    variable<TInput extends ValueInput | undefined = undefined>(
+      name: string,
+      input?: TInput,
+    ): RuntimeVariable<ValueInputValue<TInput>> {
       pushAction(actionNodes.setVariable(name, input));
-      return createRuntimeVariable(name);
+      return createRuntimeVariable<ValueInputValue<TInput>>(name);
     },
-    dictionary(value: ShortcutDictionary): RuntimeValue<ShortcutDictionary> {
-      return pushOutputAction("dictionary", {
+    dictionary<TValue extends ShortcutDictionary>(value: TValue): RuntimeValue<TValue> {
+      return pushOutputAction<TValue>("dictionary", {
         value,
       });
     },
@@ -318,8 +335,11 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     notification(title: ValueInput, body?: ValueInput): void {
       pushAction(actionNodes.notification(title, body));
     },
-    getDictionaryValue(input: ValueInput, key: ValueInput): RuntimeValue<unknown> {
-      return pushOutputAction("getDictionaryValue", {
+    getDictionaryValue<TInput extends ValueInput, TKey extends ValueInput>(
+      input: TInput,
+      key: TKey,
+    ): RuntimeValue<DictionaryValueFor<TInput, TKey>> {
+      return pushOutputAction<DictionaryValueFor<TInput, TKey>>("getDictionaryValue", {
         input,
         key,
       });
@@ -356,11 +376,11 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
         options: normalized.options,
       });
     },
-    chooseFromList(
-      input: ValueInput,
+    chooseFromList<TInput extends ValueInput>(
+      input: TInput,
       options: ChooseFromListOptions = {},
-    ): RuntimeValue<unknown> {
-      return pushOutputAction("chooseFromList", {
+    ): RuntimeValue<ValueInputListItem<TInput>> {
+      return pushOutputAction<ValueInputListItem<TInput>>("chooseFromList", {
         input,
         options,
       });
@@ -393,11 +413,11 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
         replace,
       });
     },
-    getItemFromList(
-      input: ValueInput,
+    getItemFromList<TInput extends ValueInput>(
+      input: TInput,
       options: GetItemFromListOptions = {},
-    ): RuntimeValue<unknown> {
-      return pushOutputAction("getItemFromList", {
+    ): RuntimeValue<ValueInputListItem<TInput>> {
+      return pushOutputAction<ValueInputListItem<TInput>>("getItemFromList", {
         input,
         options,
       });

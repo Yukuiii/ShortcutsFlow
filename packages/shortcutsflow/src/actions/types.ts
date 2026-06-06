@@ -159,23 +159,23 @@ export type RuntimeValue<T = unknown> = {
    *
    * 添加 Get Dictionary Value 动作并返回指定 key 的运行期值引用。
    */
-  getDictionaryValue(key: ValueInput): RuntimeValue<unknown>;
+  getDictionaryValue<TKey extends ValueInput>(
+    key: TKey,
+  ): RuntimeValue<DictionaryValueFor<RuntimeValue<T>, TKey>>;
 
   /**
    * 获取词典值。
    *
    * 添加 Get Dictionary Value 动作的简写方法，适合链式读取词典字段。
    */
-  get(key: ValueInput): RuntimeValue<unknown>;
+  get<TKey extends ValueInput>(key: TKey): RuntimeValue<DictionaryValueFor<RuntimeValue<T>, TKey>>;
 
   /**
    * 从列表中获取项目。
    *
    * 添加 Get Item from List 动作并返回列表项目的运行期值引用。
    */
-  getItem(
-    options?: GetItemFromListOptions,
-  ): RuntimeValue<T extends readonly (infer Item)[] ? Item : unknown>;
+  getItem(options?: GetItemFromListOptions): RuntimeValue<ListItem<T>>;
 
   /**
    * Base64 编码。
@@ -254,7 +254,9 @@ export type RuntimeVariable<T = unknown> = RuntimeValue<T> & {
    *
    * 添加 Set Variable 动作并把输入覆盖写入当前运行期命名变量。
    */
-  set(input?: ValueInput): RuntimeVariable<unknown>;
+  set<TInput extends ValueInput | undefined = undefined>(
+    input?: TInput,
+  ): RuntimeVariable<ValueInputValue<TInput>>;
 
   /**
    * 追加到变量。
@@ -263,6 +265,56 @@ export type RuntimeVariable<T = unknown> = RuntimeValue<T> & {
    */
   append(input: ValueInput): RuntimeVariable<unknown>;
 };
+
+type WidenLiteral<T> = T extends string
+  ? string
+  : T extends number
+    ? number
+    : T extends boolean
+      ? boolean
+      : T;
+
+type ValueInputKey<TInput> = TInput extends RuntimeValue<infer Value>
+  ? Value
+  : TInput extends ShortcutReference
+    ? unknown
+    : TInput;
+
+type DictionaryValue<TDictionary, TKey> = TDictionary extends readonly unknown[]
+  ? unknown
+  : TDictionary extends Record<string, unknown>
+    ? TKey extends keyof TDictionary
+      ? TDictionary[TKey]
+      : unknown
+    : unknown;
+
+type ListItem<T> = T extends readonly (infer Item)[] ? Item : unknown;
+
+/**
+ * 提取 ValueInput 对应的运行期值类型。
+ */
+export type ValueInputValue<TInput> = WidenLiteral<
+  TInput extends RuntimeValue<infer Value>
+    ? Value
+    : TInput extends ShortcutReference
+      ? unknown
+      : TInput extends undefined
+        ? unknown
+        : TInput
+>;
+
+/**
+ * 提取列表输入经过列表取项后的元素类型。
+ */
+export type ValueInputListItem<TInput> = ListItem<ValueInputValue<TInput>>;
+
+/**
+ * 根据词典输入和 key 输入推导词典取值的输出类型。
+ */
+export type DictionaryValueFor<TDictionaryInput, TKeyInput> = DictionaryValue<
+  ValueInputValue<TDictionaryInput>,
+  ValueInputKey<TKeyInput>
+>;
 
 type RuntimeValueInternalKey = "kind" | "value" | "valueType";
 
@@ -371,7 +423,10 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  setVariable(name: string, input?: ValueInput): RuntimeVariable<unknown>;
+  setVariable<TInput extends ValueInput | undefined = undefined>(
+    name: string,
+    input?: TInput,
+  ): RuntimeVariable<ValueInputValue<TInput>>;
 
   /**
    * 变量。
@@ -387,7 +442,10 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  variable(name: string, input?: ValueInput): RuntimeVariable<unknown>;
+  variable<TInput extends ValueInput | undefined = undefined>(
+    name: string,
+    input?: TInput,
+  ): RuntimeVariable<ValueInputValue<TInput>>;
 
   /**
    * 词典。
@@ -406,7 +464,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  dictionary(value: ShortcutDictionary): RuntimeValue<ShortcutDictionary>;
+  dictionary<TValue extends ShortcutDictionary>(value: TValue): RuntimeValue<TValue>;
 
   /**
    * URL。
@@ -469,7 +527,10 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  getDictionaryValue(input: ValueInput, key: ValueInput): RuntimeValue<unknown>;
+  getDictionaryValue<TInput extends ValueInput, TKey extends ValueInput>(
+    input: TInput,
+    key: TKey,
+  ): RuntimeValue<DictionaryValueFor<TInput, TKey>>;
 
   /**
    * 获取 URL 内容。
@@ -558,7 +619,10 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  chooseFromList(input: ValueInput, options?: ChooseFromListOptions): RuntimeValue<unknown>;
+  chooseFromList<TInput extends ValueInput>(
+    input: TInput,
+    options?: ChooseFromListOptions,
+  ): RuntimeValue<ValueInputListItem<TInput>>;
 
   /**
    * 从输入中获取词典。
@@ -638,7 +702,10 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  getItemFromList(input: ValueInput, options?: GetItemFromListOptions): RuntimeValue<unknown>;
+  getItemFromList<TInput extends ValueInput>(
+    input: TInput,
+    options?: GetItemFromListOptions,
+  ): RuntimeValue<ValueInputListItem<TInput>>;
 
   /**
    * 等待。
