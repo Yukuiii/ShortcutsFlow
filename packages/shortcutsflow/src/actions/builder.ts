@@ -188,7 +188,7 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
   };
 
   return {
-    comment(textValue: string): void {
+    comment(textValue: ValueInput): void {
       pushAction(actionNodes.comment(textValue));
     },
     text(value: ValueInput): RuntimeValue<string> {

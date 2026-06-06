@@ -37,7 +37,7 @@ function action(actionName: string, params: Record<string, unknown> = {}): Short
  * const node = comment("Generated from TypeScript.");
  * ```
  */
-export function comment(text: string): ShortcutActionNode {
+export function comment(text: ValueInput): ShortcutActionNode {
   return action("comment", {
     text,
   });

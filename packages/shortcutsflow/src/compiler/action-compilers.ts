@@ -130,9 +130,12 @@ export function getActionCompiler(action: string): ActionCompiler | undefined {
 /**
  * 编译 Comment 动作参数。
  */
-function compileCommentParameters(node: ShortcutActionNode): Record<string, PlistValue> {
+function compileCommentParameters(
+  node: ShortcutActionNode,
+  context: CompileContext,
+): Record<string, PlistValue> {
   return {
-    WFCommentActionText: String(node.params.text ?? ""),
+    WFCommentActionText: compileTextToken(node.params.text, context),
   };
 }
 

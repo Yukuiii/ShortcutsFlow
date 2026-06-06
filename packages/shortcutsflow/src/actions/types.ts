@@ -134,7 +134,7 @@ export type WorkflowBuilder = {
   /**
    * 注释。
    *
-   * 添加一条 Shortcuts Comment 动作，用于在生成的快捷指令里记录说明，不会产生可供后续动作引用的输出。
+   * 添加一条 Shortcuts Comment 动作，用于在生成的快捷指令里记录说明，内容可以引用上游 action 输出。
    *
    * @example
    * ```ts
@@ -143,7 +143,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  comment(text: string): void;
+  comment(text: ValueInput): void;
 
   /**
    * 文本。

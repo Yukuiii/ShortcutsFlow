@@ -14,7 +14,7 @@
 
 | Builder DSL | Native action | Identifier | 关键参数 | 输出命名 | 备注 |
 | --- | --- | --- | --- | --- | --- |
-| `shortcut.comment(text)` | Comment | `is.workflow.actions.comment` | `WFCommentActionText` | 无 | 纯注释，不产生运行期输出。 |
+| `shortcut.comment(text)` | Comment | `is.workflow.actions.comment` | `WFCommentActionText` | 无 | 纯注释，不产生运行期输出，内容支持文本 token。 |
 | `shortcut.text(value)` | Text | `is.workflow.actions.gettext` | `WFTextActionText`, `UUID` | `文本` | 返回值可用 `const message = shortcut.text(...)` 接收。 |
 | `shortcut.dictionary(value)` | Dictionary | `is.workflow.actions.dictionary` | `WFItems`, `UUID` | `词典` | 当前支持基础对象、数组、嵌套对象。 |
 | `shortcut.setVariable(name, input?)` | Set Variable | `is.workflow.actions.setvariable` | `WFVariableName`, `WFInput` | 无 | 用于显式创建 Shortcuts 运行期命名变量；普通链式引用优先用 `const value = shortcut.text(...)`。 |
