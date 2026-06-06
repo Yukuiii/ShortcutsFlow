@@ -15,6 +15,30 @@ export default defineShortcut({
       },
     });
 
+    const result = shortcut.if(shortcut.equals(message, "Hello"), {
+      then: (shortcut) => {
+        shortcut.showResult(result);
+      },
+    });
+
+    const result1 = shortcut.if(shortcut.equals(message, "Hello"), {
+      then: (shortcut) => {
+        const result2 = shortcut.if(shortcut.equals(message, "Hello"), {
+          then: (shortcut) => {
+            shortcut.showResult("Matched");
+          },
+          otherwise: (shortcut) => {
+            shortcut.showResult("Not matched");
+          },
+        });
+
+        shortcut.showResult(result2);
+      },
+      otherwise: (shortcut) => {
+        shortcut.showResult("Not matched");
+      },
+    });
+
     shortcut.showResult(ifResult);
 
     shortcut.if(shortcut.equals(message, "Hello"), {
