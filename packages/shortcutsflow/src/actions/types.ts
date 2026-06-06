@@ -23,6 +23,10 @@ export type ChooseFromListOptions = {
   prompt?: ValueInput;
 };
 
+export type ShowAlertOptions = {
+  showCancelButton?: boolean;
+};
+
 export type SplitTextSeparator = "New Lines" | "Spaces" | "Commas";
 
 export type SplitTextOptions = {
@@ -169,6 +173,23 @@ export type WorkflowBuilder = {
    * ```
    */
   showResult(input: ValueInput): void;
+
+  /**
+   * 显示提醒。
+   *
+   * 添加 Show Alert 动作，用于在快捷指令运行时弹出标题、内容和可选取消按钮。
+   *
+   * @example
+   * ```ts
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Build complete");
+   *   shortcut.showAlert("ShortcutsFlow", message, {
+   *     showCancelButton: false,
+   *   });
+   * }
+   * ```
+   */
+  showAlert(title: ValueInput, message: ValueInput, options?: ShowAlertOptions): void;
 
   /**
    * 设定变量。

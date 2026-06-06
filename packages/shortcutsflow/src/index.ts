@@ -10,6 +10,7 @@ export type {
   HTTPMethod,
   OpenAppInput,
   RuntimeValue,
+  ShowAlertOptions,
   SplitTextOptions,
   SplitTextSeparator,
   ValueInput,

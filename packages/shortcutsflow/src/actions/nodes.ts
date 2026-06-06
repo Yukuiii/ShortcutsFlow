@@ -13,6 +13,7 @@ import type {
   GetItemFromListOptions,
   MenuItems,
   OpenAppInput,
+  ShowAlertOptions,
   SplitTextOptions,
   ValueInput,
 } from "./types.js";
@@ -67,6 +68,28 @@ export function text(value: ValueInput): ShortcutActionNode {
 export function showResult(input: ValueInput): ShortcutActionNode {
   return action("showResult", {
     input,
+  });
+}
+
+/**
+ * 创建 Shortcuts Show Alert 动作节点，适合直接构造 AST 时弹出阻塞式提醒。
+ *
+ * @example
+ * ```ts
+ * const node = showAlert("ShortcutsFlow", "Build complete", {
+ *   showCancelButton: false,
+ * });
+ * ```
+ */
+export function showAlert(
+  title: ValueInput,
+  message: ValueInput,
+  options: ShowAlertOptions = {},
+): ShortcutActionNode {
+  return action("showAlert", {
+    title,
+    message,
+    options,
   });
 }
 

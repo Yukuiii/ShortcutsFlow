@@ -19,6 +19,7 @@
 | `shortcut.dictionary(value)` | Dictionary | `is.workflow.actions.dictionary` | `WFItems`, `UUID` | `词典` | 当前支持基础对象、数组、嵌套对象。 |
 | `shortcut.setVariable(name, input?)` | Set Variable | `is.workflow.actions.setvariable` | `WFVariableName`, `WFInput` | 无 | 用于显式创建 Shortcuts 运行期命名变量；普通链式引用优先用 `const value = shortcut.text(...)`。 |
 | `shortcut.showResult(input)` | Show Result | `is.workflow.actions.showresult` | `Text` | 无 | 用于调试和展示最终结果，变量输入需要编译为 `WFTextTokenString`。 |
+| `shortcut.showAlert(title, message, options?)` | Show Alert | `is.workflow.actions.alert` | `WFAlertActionTitle`, `WFAlertActionMessage`, `WFAlertActionCancelButtonShown` | 无 | 用于弹出阻塞式提醒，支持控制是否显示取消按钮。 |
 | `shortcut.url(value)` | URL | `is.workflow.actions.url` | `WFURLActionURL`, `UUID` | `URL` | 返回值可用 `const url = shortcut.url(...)` 接收。 |
 | `shortcut.openURL(input)` | Open URLs | `is.workflow.actions.openurl` | `WFInput`, `Show-WFInput` | 无 | 当前默认显示输入。 |
 | `shortcut.notification(title, body?)` | Show Notification | `is.workflow.actions.notification` | `WFNotificationActionTitle`, `WFNotificationActionBody` | 无 | 当前只覆盖标题和正文。 |
@@ -97,11 +98,12 @@
 
 ## 真实样本已出现的 Native identifiers
 
-以下来自仓库根目录的 `天猫双十一幻想岛自动任务.unsigned.json`，可作为后续 fixture 来源。
+以下来自仓库根目录的 `天猫双十一幻想岛自动任务.unsigned.json` 和已验证的 iCloud 样本，可作为后续 fixture 来源。
 
 ```txt
 is.workflow.actions.appendvariable
 is.workflow.actions.ask
+is.workflow.actions.alert
 is.workflow.actions.base64encode
 is.workflow.actions.choosefromlist
 is.workflow.actions.choosefrommenu

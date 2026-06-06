@@ -99,6 +99,10 @@ export const actionCompilers: Record<string, ActionCompiler> = {
     identifier: "is.workflow.actions.showresult",
     compile: compileShowResultParameters,
   },
+  showAlert: {
+    identifier: "is.workflow.actions.alert",
+    compile: compileShowAlertParameters,
+  },
   splitText: {
     identifier: "is.workflow.actions.text.split",
     outputName: "拆分文本",
@@ -340,6 +344,28 @@ function compileShowResultParameters(
 ): Record<string, PlistValue> {
   return {
     Text: compileTextToken(node.params.input, context),
+  };
+}
+
+/**
+ * 编译 Show Alert 动作参数。
+ */
+function compileShowAlertParameters(
+  node: ShortcutActionNode,
+  context: CompileContext,
+): Record<string, PlistValue> {
+  const options = (node.params.options ?? {}) as {
+    showCancelButton?: boolean;
+  };
+
+  return {
+    WFAlertActionTitle: compileTextToken(node.params.title, context),
+    WFAlertActionMessage: compileTextToken(node.params.message, context),
+    ...(options.showCancelButton === undefined
+      ? {}
+      : {
+          WFAlertActionCancelButtonShown: options.showCancelButton,
+        }),
   };
 }
 

@@ -77,6 +77,7 @@ shortcut.text
 shortcut.dictionary
 shortcut.setVariable
 shortcut.showResult
+shortcut.showAlert
 shortcut.url
 shortcut.openURL
 shortcut.notification

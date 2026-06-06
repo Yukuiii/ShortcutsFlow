@@ -22,6 +22,7 @@ import type {
   GetItemFromListOptions,
   OpenAppInput,
   RuntimeValue,
+  ShowAlertOptions,
   SplitTextSeparator,
   SplitTextOptions,
   ValueInput,
@@ -197,6 +198,13 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     },
     showResult(input: ValueInput): void {
       pushAction(actionNodes.showResult(input));
+    },
+    showAlert(
+      title: ValueInput,
+      message: ValueInput,
+      options: ShowAlertOptions = {},
+    ): void {
+      pushAction(actionNodes.showAlert(title, message, options));
     },
     setVariable(name: string, input?: ValueInput): RuntimeValue<string> {
       pushAction(actionNodes.setVariable(name, input));
