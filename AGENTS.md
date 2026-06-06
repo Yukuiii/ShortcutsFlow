@@ -32,6 +32,7 @@ Tests use Node’s built-in runner through `tsx --test`. Add focused tests for D
 ## Commit & Pull Request Guidelines
 
 Use Conventional Commits. The body is required; do not create subject-only commits.
+Commits must be atomic: each commit should contain one coherent change set and must not include unrelated edits.
 
 ```txt
 type(scope): short imperative description
