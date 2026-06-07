@@ -3,7 +3,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
-import { assertNoRuntimeSyntaxMisuse } from "../../packages/shortcutsflow/src/cli/runtime-guard.ts";
+import { assertNoRuntimeSyntaxMisuse } from "../../packages/shortcutsflow/src/runtime-guard/index.ts";
 
 /**
  * 写入临时 shortcut 源码并返回文件路径。

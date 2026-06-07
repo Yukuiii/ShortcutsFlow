@@ -1,18 +1,18 @@
 import { readFileSync } from "node:fs";
 import ts from "typescript";
-import { isFunctionLikeWithBody } from "./runtime-guard/ast.js";
-import { createRuntimeGuardContext } from "./runtime-guard/context.js";
+import { isFunctionLikeWithBody } from "./ast.js";
+import { createRuntimeGuardContext } from "./context.js";
 import {
   checkIfResultAssignmentSelfReference,
   checkIfResultSelfReference,
-} from "./runtime-guard/rules/if-result-self-reference.js";
+} from "./rules/if-result-self-reference.js";
 import {
   checkNativeBinaryExpression,
   checkNativeConditionalExpression,
   checkNativeIfStatement,
-} from "./runtime-guard/rules/native-syntax.js";
-import { isShortcutValueRefExpression } from "./runtime-guard/runtime-values.js";
-import type { RuntimeGuardIssue } from "./runtime-guard/context.js";
+} from "./rules/native-syntax.js";
+import { isShortcutValueRefExpression } from "./runtime-values.js";
+import type { RuntimeGuardIssue } from "./context.js";
 
 /**
  * 在导入用户模块前检查常见运行期值原生语法误用。

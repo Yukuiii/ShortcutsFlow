@@ -7,7 +7,7 @@ import {
   readConfiguredShortcutInputs,
 } from "../config.js";
 import { toKebabCase } from "../filename.js";
-import { assertNoRuntimeSyntaxMisuse } from "../runtime-guard.js";
+import { assertNoRuntimeSyntaxMisuse } from "../../runtime-guard/index.js";
 import { loadShortcutDefinition } from "../shortcut-module.js";
 
 type BuildOptions = {

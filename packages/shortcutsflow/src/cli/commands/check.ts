@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { loadConfiguredShortcutInputs } from "../config.js";
-import { assertNoRuntimeSyntaxMisuse } from "../runtime-guard.js";
+import { assertNoRuntimeSyntaxMisuse } from "../../runtime-guard/index.js";
 
 /**
  * 执行 check 命令。
