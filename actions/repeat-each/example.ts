@@ -6,9 +6,9 @@ export default defineShortcut({
   workflow: (shortcut) => {
     const items = shortcut.text("one,two,three");
 
-    shortcut.repeatEach(items, (shortcut) => {
+    shortcut.repeatEach(items, (shortcut, item) => {
       shortcut.comment("Repeat body");
-      shortcut.showResult("Handling repeated item");
+      shortcut.showResult(item);
     });
   },
 });

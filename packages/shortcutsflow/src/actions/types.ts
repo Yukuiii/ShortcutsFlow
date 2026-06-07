@@ -6,15 +6,9 @@ import type {
 } from "../core/types.js";
 import type { ShortcutIconInput } from "../core/icon.js";
 
-declare const shortcutReferenceBrand: unique symbol;
-
 declare const shortcutValueRefBrand: unique symbol;
 
-export type ValueInput = string | number | boolean | ShortcutReference | ShortcutValueRef;
-
-export type ShortcutReference<T = unknown> = {
-  readonly [shortcutReferenceBrand]: T;
-};
+export type ValueInput = string | number | boolean | ShortcutValueRef;
 
 export type HTTPMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
@@ -282,9 +276,7 @@ type WidenLiteral<T> = T extends string
 
 type ValueInputKey<TInput> = TInput extends ShortcutValueRef<infer Value>
   ? Value
-  : TInput extends ShortcutReference
-    ? unknown
-    : TInput;
+  : TInput;
 
 type DictionaryValue<TDictionary, TKey> = TDictionary extends readonly unknown[]
   ? unknown
@@ -302,11 +294,9 @@ type ListItem<T> = T extends readonly (infer Item)[] ? Item : unknown;
 export type ValueInputValue<TInput> = WidenLiteral<
   TInput extends ShortcutValueRef<infer Value>
     ? Value
-    : TInput extends ShortcutReference
+    : TInput extends undefined
       ? unknown
-      : TInput extends undefined
-        ? unknown
-        : TInput
+      : TInput
 >;
 
 /**
@@ -330,10 +320,6 @@ type ShortcutValueRefInternalKeyCheck = AssertNoShortcutValueRefInternalKeys<
   Extract<keyof ShortcutValueRef, ShortcutValueRefInternalKey>
 >;
 
-type ShortcutReferenceInternalKeyCheck = AssertNoShortcutValueRefInternalKeys<
-  Extract<keyof ShortcutReference, ShortcutValueRefInternalKey>
->;
-
 type ShortcutVariableRefInternalKeyCheck = AssertNoShortcutValueRefInternalKeys<
   Extract<keyof ShortcutVariableRef, ShortcutValueRefInternalKey>
 >;
@@ -347,6 +333,11 @@ export type OpenAppInput = string | {
 export type MenuItems = Record<string, ShortcutNode[]>;
 
 export type WorkflowBranch = (shortcut: WorkflowBuilder) => void;
+
+export type RepeatEachBranch<TInput extends ValueInput = ValueInput> = (
+  shortcut: WorkflowBuilder,
+  item: ShortcutValueRef<ValueInputListItem<TInput>>,
+) => void;
 
 /**
  * 可复用 workflow 片段。
@@ -1050,7 +1041,7 @@ export type WorkflowBuilder = {
    * }
    * ```
    */
-  repeatEach(input: ValueInput, body: WorkflowBranch): void;
+  repeatEach<TInput extends ValueInput>(input: TInput, body: RepeatEachBranch<TInput>): void;
 
   /**
    * 从菜单中选取。

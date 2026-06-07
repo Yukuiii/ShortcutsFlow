@@ -12,7 +12,7 @@ import {
   checkNativeIfStatement,
 } from "./rules/native-syntax.js";
 import { isShortcutValueRefExpression } from "./runtime-values.js";
-import type { RuntimeGuardIssue } from "./context.js";
+import type { RuntimeGuardContext, RuntimeGuardIssue } from "./context.js";
 
 /**
  * 在导入用户模块前检查常见运行期值原生语法误用。
@@ -42,6 +42,7 @@ function collectRuntimeGuardIssues(sourceFile: ts.SourceFile): RuntimeGuardIssue
   const visit = (node: ts.Node): void => {
     if (isFunctionLikeWithBody(node)) {
       context.pushScope();
+      addRepeatEachRuntimeParameters(node, context);
       ts.forEachChild(node, visit);
       context.popScope();
       return;
@@ -73,4 +74,39 @@ function collectRuntimeGuardIssues(sourceFile: ts.SourceFile): RuntimeGuardIssue
 
   visit(sourceFile);
   return context.issues;
+}
+
+/**
+ * repeatEach 的第二个回调参数是 Shortcuts 运行期 Repeat Item 引用。
+ */
+function addRepeatEachRuntimeParameters(node: ts.Node, context: RuntimeGuardContext): void {
+  if (!isRepeatEachBody(node)) {
+    return;
+  }
+
+  const itemParameter = node.parameters[1];
+
+  if (itemParameter && ts.isIdentifier(itemParameter.name)) {
+    context.currentScope().add(itemParameter.name.text);
+  }
+}
+
+/**
+ * 判断函数节点是否是 shortcut.repeatEach(input, body) 的 body 参数。
+ */
+function isRepeatEachBody(node: ts.Node): node is ts.FunctionLikeDeclaration & {
+  parameters: ts.NodeArray<ts.ParameterDeclaration>;
+} {
+  const parent = node.parent;
+
+  if (!ts.isCallExpression(parent) || parent.arguments[1] !== node) {
+    return false;
+  }
+
+  const callee = parent.expression;
+
+  return ts.isPropertyAccessExpression(callee) &&
+    ts.isIdentifier(callee.expression) &&
+    callee.expression.text === "shortcut" &&
+    callee.name.text === "repeatEach";
 }

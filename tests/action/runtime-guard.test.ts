@@ -239,3 +239,30 @@ test("runtime guard 拦截 shortcut.use 返回值的原生 if", () => {
     removeShortcutSource(file);
   }
 });
+
+test("runtime guard 拦截 repeatEach 当前项的原生 if", () => {
+  const file = writeShortcutSource(`
+    import { defineShortcut } from "shortcutsflow";
+
+    export default defineShortcut({
+      name: "Repeat Item Native If",
+      workflow: (shortcut) => {
+        const items = shortcut.splitText("one\\ntwo");
+        shortcut.repeatEach(items, (shortcut, item) => {
+          if (item) {
+            shortcut.showResult(item);
+          }
+        });
+      },
+    });
+  `);
+
+  try {
+    assert.throws(
+      () => assertNoRuntimeSyntaxMisuse(file),
+      /Use shortcut\.if\(value\.exists\(\), \.\.\.\) or shortcut\.when\(value\.exists\(\), \.\.\.\) instead of native if/,
+    );
+  } finally {
+    removeShortcutSource(file);
+  }
+});

@@ -1,15 +1,5 @@
-import { ref as createRef } from "./core/value.js";
-import type { ShortcutReference } from "./actions/types.js";
-
 export { defineShortcut } from "./actions/builder.js";
 export { icon } from "./core/icon.js";
-
-/**
- * 创建一个运行期命名变量引用。
- */
-export function ref(name: string): ShortcutReference<string> {
-  return createRef(name) as unknown as ShortcutReference<string>;
-}
 
 export type {
   AskForInputOptions,
@@ -23,8 +13,8 @@ export type {
   GetItemFromListOptions,
   HTTPMethod,
   OpenAppInput,
+  RepeatEachBranch,
   ShortcutComponent,
-  ShortcutReference,
   ShortcutValueRef,
   ShortcutVariableRef,
   ShowAlertOptions,

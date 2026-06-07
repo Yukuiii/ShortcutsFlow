@@ -31,13 +31,6 @@ export function actionOutput<T = unknown>(name: string): ShortcutValue<T> {
 }
 
 /**
- * 创建一个运行期变量引用的简写形式。
- */
-export function ref(name: string): ShortcutValue<string> {
-  return variable(name);
-}
-
-/**
  * 判断一个值是否为框架内部的 ShortcutValue。
  */
 export function isShortcutValue(value: unknown): value is ShortcutValue {

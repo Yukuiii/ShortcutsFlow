@@ -72,8 +72,9 @@ export default defineShortcut({
       },
     });
 
-    shortcut.repeatEach(itemList, (shortcut) => {
+    shortcut.repeatEach(itemList, (shortcut, item) => {
       shortcut.comment("Repeat body placeholder.");
+      shortcut.appendVariable("Action Log", item);
     });
 
     shortcut.chooseFromMenu("Choose next action", {

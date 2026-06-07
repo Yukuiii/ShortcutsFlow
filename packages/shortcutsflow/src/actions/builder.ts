@@ -33,6 +33,7 @@ import type {
   GetContentsOfURLOptions,
   GetItemFromListOptions,
   OpenAppInput,
+  RepeatEachBranch,
   ShortcutValueRef,
   ShortcutVariableRef,
   ShowAlertOptions,
@@ -285,6 +286,18 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     branch(createWorkflowBuilder(branchNodes, state));
     return branchNodes;
   };
+  const collectRepeatEachBranch = <TInput extends ValueInput>(
+    branch: RepeatEachBranch<TInput>,
+  ): ShortcutNode[] => {
+    const branchNodes: ShortcutNode[] = [];
+    const branchBuilder = createWorkflowBuilder(branchNodes, state);
+    const repeatItem = createShortcutValueRef<ValueInputListItem<TInput>>(
+      createVariableReference("Repeat Item") as ShortcutValue<ValueInputListItem<TInput>>,
+    );
+
+    branch(branchBuilder, repeatItem);
+    return branchNodes;
+  };
 
   const builder: WorkflowBuilder = {
     use<Props, Output>(
@@ -491,11 +504,11 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
         then: collectBranch(then),
       });
     },
-    repeatEach(input: ValueInput, body: WorkflowBranch): void {
+    repeatEach<TInput extends ValueInput>(input: TInput, body: RepeatEachBranch<TInput>): void {
       nodes.push({
         kind: "repeatEach",
         input,
-        body: collectBranch(body),
+        body: collectRepeatEachBranch(body),
       });
     },
     chooseFromMenu(prompt: string, items: Record<string, WorkflowBranch>): void {
