@@ -212,3 +212,30 @@ test("runtime guard 允许之前的 if 结果在后续分支中引用", () => {
     removeShortcutSource(file);
   }
 });
+
+test("runtime guard 拦截 shortcut.use 返回值的原生 if", () => {
+  const file = writeShortcutSource(`
+    import { defineShortcut } from "shortcutsflow";
+
+    const buildMessage = (shortcut) => shortcut.text("Hello");
+
+    export default defineShortcut({
+      name: "Use Native If",
+      workflow: (shortcut) => {
+        const message = shortcut.use(buildMessage);
+        if (message) {
+          shortcut.showResult(message);
+        }
+      },
+    });
+  `);
+
+  try {
+    assert.throws(
+      () => assertNoRuntimeSyntaxMisuse(file),
+      /Use shortcut\.if\(value\.exists\(\), \.\.\.\) or shortcut\.when\(value\.exists\(\), \.\.\.\) instead of native if/,
+    );
+  } finally {
+    removeShortcutSource(file);
+  }
+});

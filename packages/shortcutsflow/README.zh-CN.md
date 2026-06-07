@@ -28,11 +28,23 @@ import { defineShortcut, icon } from "shortcutsflow";
 export default defineShortcut({
   name: "Basic Shortcut",
   icon: icon.create(icon.color.blue, icon.glyph.shortcuts),
-  workflow: (shortcut) => {
+workflow: (shortcut) => {
     const message = shortcut.text("Hello from ShortcutsFlow");
     shortcut.showResult(message);
   },
 });
+```
+
+可复用 workflow 片段就是普通函数。如果希望调用位置保持 DSL 风格，可以使用 `shortcut.use(...)`：
+
+```ts
+import { type ShortcutComponent, type ValueInput } from "shortcutsflow";
+
+export const Notify: ShortcutComponent<{
+  message: ValueInput;
+}> = (shortcut, props) => {
+  shortcut.notification("Done", props.message);
+};
 ```
 
 ## 配置入口
@@ -73,6 +85,7 @@ dist/<name>.unsigned.shortcut
 
 ```txt
 shortcut.comment
+shortcut.use
 shortcut.text
 shortcut.dictionary
 shortcut.setVariable

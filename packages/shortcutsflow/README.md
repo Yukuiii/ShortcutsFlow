@@ -28,11 +28,23 @@ import { defineShortcut, icon } from "shortcutsflow";
 export default defineShortcut({
   name: "Basic Shortcut",
   icon: icon.create(icon.color.blue, icon.glyph.shortcuts),
-  workflow: (shortcut) => {
+workflow: (shortcut) => {
     const message = shortcut.text("Hello from ShortcutsFlow");
     shortcut.showResult(message);
   },
 });
+```
+
+Reusable workflow fragments are ordinary functions. Use `shortcut.use(...)` when you want the call site to read like part of the DSL:
+
+```ts
+import { type ShortcutComponent, type ValueInput } from "shortcutsflow";
+
+export const Notify: ShortcutComponent<{
+  message: ValueInput;
+}> = (shortcut, props) => {
+  shortcut.notification("Done", props.message);
+};
 ```
 
 ## Configure Inputs
@@ -73,6 +85,7 @@ Common builder actions include:
 
 ```txt
 shortcut.comment
+shortcut.use
 shortcut.text
 shortcut.dictionary
 shortcut.setVariable

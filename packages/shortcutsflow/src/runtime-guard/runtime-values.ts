@@ -19,6 +19,7 @@ const shortcutValueRefMethods = new Set([
   "splitText",
   "text",
   "url",
+  "use",
   "variable",
 ]);
 

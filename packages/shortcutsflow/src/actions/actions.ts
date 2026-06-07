@@ -24,6 +24,7 @@ export type {
   HTTPMethod,
   MenuItems,
   OpenAppInput,
+  ShortcutComponent,
   ShortcutValueRef,
   ShortcutVariableRef,
   SplitTextOptions,

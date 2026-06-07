@@ -23,6 +23,7 @@ export type {
   GetItemFromListOptions,
   HTTPMethod,
   OpenAppInput,
+  ShortcutComponent,
   ShortcutReference,
   ShortcutValueRef,
   ShortcutVariableRef,

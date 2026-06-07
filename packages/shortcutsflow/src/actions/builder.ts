@@ -286,7 +286,13 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
     return branchNodes;
   };
 
-  return {
+  const builder: WorkflowBuilder = {
+    use<Props, Output>(
+      component: (shortcut: WorkflowBuilder, props?: Props) => Output,
+      props?: Props,
+    ): Output {
+      return component(builder, props);
+    },
     comment(textValue: ValueInput): void {
       pushAction(actionNodes.comment(textValue));
     },
@@ -503,6 +509,8 @@ function createWorkflowBuilder(nodes: ShortcutNode[], state: BuilderState): Work
       });
     },
   };
+
+  return builder;
 }
 
 /**

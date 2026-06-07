@@ -59,6 +59,7 @@ Builder action：
 
 ```txt
 shortcut.comment
+shortcut.use
 shortcut.text
 shortcut.dictionary
 shortcut.setVariable
@@ -139,6 +140,44 @@ export default defineShortcut({
     });
 
     shortcut.showResult(remoteConfig);
+  },
+});
+```
+
+## 复用 workflow 片段
+
+大型快捷指令可以拆成普通 TypeScript 函数。组件接收当前 `WorkflowBuilder`，在调用位置追加 action，也可以返回后续 action 继续引用的运行期值。
+
+```ts
+import {
+  defineShortcut,
+  type ShortcutComponent,
+  type ShortcutDictionary,
+  type ShortcutValueRef,
+  type ValueInput,
+} from "shortcutsflow";
+
+const fetchConfig: ShortcutComponent<{
+  url: ValueInput;
+}, ShortcutValueRef<ShortcutDictionary>> = (shortcut, props) => {
+  const response = shortcut.getContentsOfURL(props.url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return shortcut.detectDictionary(response);
+};
+
+export default defineShortcut({
+  name: "Config Shortcut",
+  workflow: (shortcut) => {
+    const config = shortcut.use(fetchConfig, {
+      url: "https://example.com/config.json",
+    });
+
+    shortcut.showResult(config.get("service"));
   },
 });
 ```

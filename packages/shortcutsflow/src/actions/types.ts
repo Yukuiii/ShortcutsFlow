@@ -348,6 +348,17 @@ export type MenuItems = Record<string, ShortcutNode[]>;
 
 export type WorkflowBranch = (shortcut: WorkflowBuilder) => void;
 
+/**
+ * 可复用 workflow 片段。
+ *
+ * 组件会在调用位置向当前 workflow 或控制流分支追加 action，
+ * 并且可以返回后续 action 继续引用的运行期值。
+ */
+export type ShortcutComponent<Props = undefined, Output = void> =
+  [Props] extends [undefined]
+    ? (shortcut: WorkflowBuilder) => Output
+    : (shortcut: WorkflowBuilder, props: Props) => Output;
+
 export type BuilderShortcutDefinition = {
   name: string;
   icon?: ShortcutIconInput;
@@ -355,6 +366,27 @@ export type BuilderShortcutDefinition = {
 };
 
 export type WorkflowBuilder = {
+  /**
+   * 使用可复用 workflow 片段。
+   *
+   * 组件中的 action 会插入到当前调用位置；在 If、Repeat、Menu 分支中调用时，
+   * action 会插入到对应分支里。
+   *
+   * @example
+   * ```ts
+   * const Notify: ShortcutComponent<{ message: ValueInput }> = (shortcut, props) => {
+   *   shortcut.notification("Done", props.message);
+   * };
+   *
+   * workflow: (shortcut) => {
+   *   const message = shortcut.text("Hello");
+   *   shortcut.use(Notify, { message });
+   * }
+   * ```
+   */
+  use<Output>(component: ShortcutComponent<undefined, Output>): Output;
+  use<Props, Output>(component: ShortcutComponent<Props, Output>, props: Props): Output;
+
   /**
    * 注释。
    *

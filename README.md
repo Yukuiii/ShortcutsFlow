@@ -59,6 +59,7 @@ Builder actions:
 
 ```txt
 shortcut.comment
+shortcut.use
 shortcut.text
 shortcut.dictionary
 shortcut.setVariable
@@ -139,6 +140,44 @@ export default defineShortcut({
     });
 
     shortcut.showResult(remoteConfig);
+  },
+});
+```
+
+## Reusable Workflow Fragments
+
+Large shortcuts can be split into ordinary TypeScript functions. A component receives the current `WorkflowBuilder`, appends actions at the call site, and may return a runtime value for later actions.
+
+```ts
+import {
+  defineShortcut,
+  type ShortcutComponent,
+  type ShortcutDictionary,
+  type ShortcutValueRef,
+  type ValueInput,
+} from "shortcutsflow";
+
+const fetchConfig: ShortcutComponent<{
+  url: ValueInput;
+}, ShortcutValueRef<ShortcutDictionary>> = (shortcut, props) => {
+  const response = shortcut.getContentsOfURL(props.url, {
+    method: "GET",
+    headers: {
+      Accept: "application/json",
+    },
+  });
+
+  return shortcut.detectDictionary(response);
+};
+
+export default defineShortcut({
+  name: "Config Shortcut",
+  workflow: (shortcut) => {
+    const config = shortcut.use(fetchConfig, {
+      url: "https://example.com/config.json",
+    });
+
+    shortcut.showResult(config.get("service"));
   },
 });
 ```
