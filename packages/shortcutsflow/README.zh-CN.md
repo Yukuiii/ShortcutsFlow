@@ -11,7 +11,8 @@ ShortcutsFlow 与 Apple 没有关联。
 ## 环境要求
 
 - Node.js 20 或更新版本。
-- 构建 `.shortcut` 文件需要 macOS 的 `plutil`。
+- 构建未签名 `.shortcut` 文件支持跨平台，不需要 `plutil`。
+- `shortcutsflow inspect` 需要 macOS 的 `plutil`。
 - `shortcutsflow sign` 需要 macOS Shortcuts CLI。
 
 ## 安装

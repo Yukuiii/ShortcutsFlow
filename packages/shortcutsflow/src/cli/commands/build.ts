@@ -1,7 +1,7 @@
-import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { compileShortcut } from "../../compiler/index.js";
+import { serializeBinaryPlist } from "../../plist/index.js";
 import {
   loadShortcutsConfig,
   readConfiguredShortcutInputs,
@@ -63,13 +63,7 @@ async function build(options: BuildOptions): Promise<void> {
     });
     writeFileSync(xmlPath, result.xml);
     writeFileSync(jsonPath, `${JSON.stringify(result.plist, null, 2)}\n`);
-    execFileSync("plutil", [
-      "-convert",
-      "binary1",
-      "-o",
-      shortcutPath,
-      xmlPath,
-    ]);
+    writeFileSync(shortcutPath, serializeBinaryPlist(result.plist));
 
     console.log(`Built ${result.name}`);
     console.log(`  ${xmlPath}`);

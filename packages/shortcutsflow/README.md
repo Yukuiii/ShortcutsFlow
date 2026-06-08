@@ -11,7 +11,8 @@ ShortcutsFlow is not affiliated with Apple.
 ## Requirements
 
 - Node.js 20 or newer.
-- macOS with `plutil` for building `.shortcut` files.
+- Building unsigned `.shortcut` files is cross-platform and does not require `plutil`.
+- macOS with `plutil` for `shortcutsflow inspect`.
 - macOS Shortcuts CLI for `shortcutsflow sign`.
 
 ## Installation
